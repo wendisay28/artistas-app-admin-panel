@@ -56,7 +56,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-[#f8f6ff] pb-12">
       <div className="animate-fade-in">
         <Header
-          title="Resumen"
+          title="Dashboard"
           subtitle="Vista general de la plataforma"
         />
 

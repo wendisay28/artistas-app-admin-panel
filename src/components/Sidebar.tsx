@@ -10,7 +10,7 @@ import {
 const navSections = [
   {
     label: 'Principal',
-    items: [{ href: '/', label: 'Resumen', icon: LayoutDashboard }],
+    items: [{ href: '/', label: 'Dashboard', icon: LayoutDashboard }],
   },
   {
     label: 'Gestión',

@@ -3,76 +3,83 @@
 import { useState } from 'react'
 import Header from '@/components/Header'
 import { 
-  Search, UserCheck, UserX, Shield, Edit, Trash2, 
-  Mail, Calendar, Briefcase, Filter, MoreHorizontal 
+  Search, 
+  UserCheck, 
+  Shield, 
+  Briefcase, 
+  Edit, 
+  Trash2, 
+  Mail, 
+  Plus, 
+  MoreVertical,
+  UserPlus
 } from 'lucide-react'
 
 // --- DATOS SIMULADOS ---
 const usuariosInitial = [
-  { id: 1, nombre: 'Carlos Mendoza', email: 'carlos@gmail.com', rol: 'cliente', contratos: 5, registro: '2025-11-12', estado: 'activo', iniciales: 'CM' },
-  { id: 2, nombre: 'Sofía Ramírez', email: 'sofia.r@hotmail.com', rol: 'cliente', contratos: 2, registro: '2025-12-01', estado: 'activo', iniciales: 'SR' },
-  { id: 3, nombre: 'Lic. Torres Admin', email: 'torres@artistasapp.mx', rol: 'admin', contratos: 0, registro: '2025-10-01', estado: 'activo', iniciales: 'TA' },
-  { id: 4, nombre: 'Bodas del Norte SA', email: 'contacto@bodasdelnorte.com', rol: 'empresa', contratos: 8, registro: '2025-09-15', estado: 'activo', iniciales: 'BN' },
-  { id: 5, nombre: 'Pedro Loza', email: 'pedro_loza@outlook.com', rol: 'cliente', contratos: 1, registro: '2026-01-08', estado: 'inactivo', iniciales: 'PL' },
-  { id: 6, nombre: 'Club Nocturno Éclat', email: 'eventos@eclat.mx', rol: 'empresa', contratos: 12, registro: '2025-08-20', estado: 'activo', iniciales: 'CE' },
-  { id: 7, nombre: 'Ana Gutiérrez', email: 'ana.g@gmail.com', rol: 'cliente', contratos: 3, registro: '2026-01-22', estado: 'activo', iniciales: 'AG' },
-  { id: 8, nombre: 'Hotel Marqués', email: 'eventos@hotelmarques.com.mx', rol: 'empresa', contratos: 6, registro: '2025-10-10', estado: 'activo', iniciales: 'HM' },
+  { id: 'USR-001', nombre: 'Carlos Mendoza', email: 'carlos@gmail.com', rol: 'cliente', contratos: 5, registro: '2025-11-12', estado: 'activo', iniciales: 'CM' },
+  { id: 'USR-002', nombre: 'Sofía Ramírez', email: 'sofia.r@hotmail.com', rol: 'cliente', contratos: 2, registro: '2025-12-01', estado: 'activo', iniciales: 'SR' },
+  { id: 'USR-003', nombre: 'Lic. Torres Admin', email: 'torres@artistasapp.mx', rol: 'admin', contratos: 0, registro: '2025-10-01', estado: 'activo', iniciales: 'TA' },
+  { id: 'USR-004', nombre: 'Bodas del Norte SA', email: 'contacto@bodasdelnorte.com', rol: 'empresa', contratos: 8, registro: '2025-09-15', estado: 'activo', iniciales: 'BN' },
+  { id: 'USR-005', nombre: 'Pedro Loza', email: 'pedro_loza@outlook.com', rol: 'cliente', contratos: 1, registro: '2026-01-08', estado: 'inactivo', iniciales: 'PL' },
+  { id: 'USR-006', nombre: 'Club Nocturno Éclat', email: 'eventos@eclat.mx', rol: 'empresa', contratos: 12, registro: '2025-08-20', estado: 'activo', iniciales: 'CE' },
 ]
 
 const rolConfig: Record<string, { label: string; bg: string; text: string; icon: any }> = {
-  cliente: { label: 'Cliente', bg: 'bg-cyan-50', text: 'text-cyan-700', icon: UserCheck },
-  admin: { label: 'Admin', bg: 'bg-purple-50', text: 'text-purple-700', icon: Shield },
-  empresa: { label: 'Empresa', bg: 'bg-indigo-50', text: 'text-indigo-700', icon: Briefcase },
+  cliente: { label: 'Cliente', bg: 'bg-cyan-50', text: 'text-cyan-600', icon: UserCheck },
+  admin: { label: 'Admin', bg: 'bg-purple-50', text: 'text-purple-600', icon: Shield },
+  empresa: { label: 'Empresa', bg: 'bg-indigo-50', text: 'text-indigo-600', icon: Briefcase },
 }
 
-const roles = ['Todos', 'cliente', 'empresa', 'admin']
+const rolesFiltro = ['Todos', 'cliente', 'empresa', 'admin']
 
 export default function UsuariosPage() {
   const [search, setSearch] = useState('')
   const [rolActivo, setRolActivo] = useState('Todos')
-  const [usuarios, setUsuarios] = useState(usuariosInitial)
 
-  const filtered = usuarios.filter((u) => {
-    const matchSearch = u.nombre.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase())
+  const filtered = usuariosInitial.filter((u) => {
+    const matchSearch = u.nombre.toLowerCase().includes(search.toLowerCase()) || 
+                        u.email.toLowerCase().includes(search.toLowerCase())
     const matchRol = rolActivo === 'Todos' || u.rol === rolActivo
     return matchSearch && matchRol
   })
 
   return (
-    <div className="min-h-screen bg-[#f8f9fc] pb-12">
-      <Header title="Usuarios" subtitle="Control de accesos y perfiles de la plataforma" />
+    <div className="min-h-screen bg-[#f8f6ff] pb-12">
+      <Header title="Usuarios" subtitle="Administra los perfiles y permisos de la plataforma" />
 
-      <main className="max-w-7xl mx-auto px-6 mt-8 space-y-8">
+      <div className="px-6 py-8 flex flex-col gap-6">
         
-        {/* Resumen de Cuentas */}
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {roles.slice(1).map((rol) => {
-            const count = usuarios.filter((u) => u.rol === rol).length
+        {/* Stats Rápidas Estilo BuscArt */}
+        <div className="flex gap-4 flex-wrap">
+          {rolesFiltro.slice(1).map((rol) => {
+            const count = usuariosInitial.filter((u) => u.rol === rol).length
             const cfg = rolConfig[rol]
             return (
-              <div key={rol} className="bg-white p-6 rounded-[24px] border border-slate-200/60 shadow-sm flex items-center gap-4">
-                <div className={`p-4 rounded-2xl ${cfg.bg} ${cfg.text}`}>
-                  <cfg.icon size={24} />
+              <div key={rol} className="bg-white px-5 py-3 rounded-2xl border border-[#7c3aed1a] shadow-sm flex items-center gap-3">
+                <div className={`p-2 rounded-lg ${cfg.bg} ${cfg.text}`}>
+                  <cfg.icon size={18} />
                 </div>
                 <div>
-                  <p className="text-2xl font-black text-slate-800">{count}</p>
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{cfg.label}s Registrados</p>
+                  <p className="text-sm font-bold text-[#1e1b4b] leading-none">{count}</p>
+                  <p className="text-[10px] font-medium text-[#6b7280] uppercase mt-1">{cfg.label}s</p>
                 </div>
               </div>
             )
           })}
         </div>
 
-        {/* Toolbar de Acción */}
-        <div className="bg-white p-4 rounded-[24px] border border-slate-200/60 flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex bg-slate-100 p-1 rounded-xl w-full md:w-auto overflow-x-auto">
-            {roles.map((rol) => (
+        {/* Toolbar de Filtros y Búsqueda */}
+        <div className="flex flex-wrap justify-between items-center gap-4">
+          <div className="flex gap-2">
+            {rolesFiltro.map((rol) => (
               <button
                 key={rol}
                 onClick={() => setRolActivo(rol)}
-                className={`px-6 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
-                  rolActivo === rol ? 'bg-white text-[#7c3aed] shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                className={`px-4 py-1.5 text-xs font-semibold rounded-full border transition-all ${
+                  rolActivo === rol 
+                  ? 'bg-[#7c3aed] text-white border-[#7c3aed] shadow-sm' 
+                  : 'bg-white text-[#6b7280] border-[#e5e7eb] hover:border-[#7c3aed]'
                 }`}
               >
                 {rol === 'Todos' ? 'Todos' : rolConfig[rol].label + 's'}
@@ -80,85 +87,95 @@ export default function UsuariosPage() {
             ))}
           </div>
 
-          <div className="relative w-full md:w-80 group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#7c3aed] transition-colors" size={18} />
-            <input
-              type="text"
-              placeholder="Buscar por nombre o email..."
-              className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:bg-white focus:border-[#7c3aed] transition-all text-sm font-medium"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+          <div className="flex gap-2">
+            <div className="relative">
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9ca3af]" />
+              <input
+                type="text"
+                placeholder="Buscar usuario..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-9 pr-4 py-2 text-sm border border-[#e5e7eb] rounded-xl outline-none w-[260px] focus:border-[#7c3aed] focus:ring-2 focus:ring-[#7c3aed10] transition-all bg-white"
+              />
+            </div>
+            <button className="flex items-center gap-2 px-4 py-2 bg-[#7c3aed] text-white text-sm font-bold rounded-xl hover:bg-[#5b21b6] transition-all">
+              <UserPlus size={16} />
+              Invitar
+            </button>
           </div>
         </div>
 
-        {/* Grid de Usuarios */}
-        {filtered.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-[32px] border border-dashed border-slate-200">
-            <UserX size={48} className="mx-auto text-slate-300 mb-4" />
-            <h3 className="text-lg font-bold text-slate-800">No hay coincidencias</h3>
-            <p className="text-slate-500 text-sm">Prueba ajustando los filtros de búsqueda</p>
+        {/* Tabla Estilo Lista */}
+        <div className="bg-white border border-[#e5e7eb] rounded-2xl overflow-hidden shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="bg-[#f9fafb]">
+                  <th className="px-6 py-4 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Usuario</th>
+                  <th className="px-6 py-4 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Rol</th>
+                  <th className="px-6 py-4 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Registro</th>
+                  <th className="px-6 py-4 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Contratos</th>
+                  <th className="px-6 py-4 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Estado</th>
+                  <th className="px-6 py-4 text-right text-xs uppercase text-[#6b7280] font-bold tracking-wider">Acciones</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#f3f4f6]">
+                {filtered.map((u) => {
+                  const cfg = rolConfig[u.rol]
+                  return (
+                    <tr key={u.id} className="hover:bg-[#f8f6ff] transition-colors group">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#7c3aed] to-[#4f46e5] flex items-center justify-center text-white text-xs font-bold">
+                            {u.iniciales}
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-bold text-[#111827] group-hover:text-[#7c3aed] transition-colors">{u.nombre}</span>
+                            <span className="text-[11px] text-[#9ca3af] flex items-center gap-1">
+                              <Mail size={10} /> {u.email}
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold ${cfg.bg} ${cfg.text}`}>
+                          <cfg.icon size={12} />
+                          {cfg.label}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-[#4b5563]">{u.registro}</td>
+                      <td className="px-6 py-4 text-sm font-semibold text-[#111827]">{u.contratos}</td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                          u.estado === 'activo' ? 'bg-[#ecfdf5] text-[#059669]' : 'bg-gray-100 text-gray-500'
+                        }`}>
+                          <div className={`w-1 h-1 rounded-full ${u.estado === 'activo' ? 'bg-[#059669]' : 'bg-gray-400'}`} />
+                          {u.estado}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex justify-end gap-1">
+                          <button className="p-2 text-[#9ca3af] hover:text-[#7c3aed] hover:bg-white rounded-lg transition-all">
+                            <Edit size={16} />
+                          </button>
+                          <button className="p-2 text-[#9ca3af] hover:text-red-500 hover:bg-white rounded-lg transition-all">
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filtered.map((u) => {
-              const cfg = rolConfig[u.rol]
-              return (
-                <div key={u.id} className="bg-white rounded-[28px] border border-slate-200/60 overflow-hidden hover:shadow-xl hover:shadow-indigo-500/5 transition-all group">
-                  {/* Card Header */}
-                  <div className="p-6 pb-4">
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#7c3aed] to-[#4f46e5] flex items-center justify-center text-white font-black text-lg shadow-lg shadow-indigo-100">
-                        {u.iniciales}
-                      </div>
-                      <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter flex items-center gap-1 ${
-                        u.estado === 'activo' ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500'
-                      }`}>
-                        <div className={`w-1.5 h-1.5 rounded-full ${u.estado === 'activo' ? 'bg-emerald-500' : 'bg-slate-400'}`} />
-                        {u.estado}
-                      </span>
-                    </div>
-                    
-                    <h4 className="font-bold text-slate-800 line-clamp-1">{u.nombre}</h4>
-                    <div className="flex items-center gap-1.5 text-slate-400 mt-1">
-                      <Mail size={12} />
-                      <p className="text-[11px] font-medium truncate">{u.email}</p>
-                    </div>
-                  </div>
-
-                  {/* Card Info */}
-                  <div className="px-6 py-4 bg-slate-50/50 flex justify-between items-center border-y border-slate-100">
-                    <div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase">Contratos</p>
-                      <p className="font-black text-slate-700">{u.contratos}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase">Desde</p>
-                      <p className="font-bold text-slate-700 text-xs">{u.registro}</p>
-                    </div>
-                  </div>
-
-                  {/* Card Actions */}
-                  <div className="p-4 flex items-center justify-between">
-                    <span className={`px-3 py-1.5 rounded-xl text-[10px] font-bold flex items-center gap-1.5 ${cfg.bg} ${cfg.text}`}>
-                      <cfg.icon size={12} />
-                      {cfg.label}
-                    </span>
-                    <div className="flex gap-1">
-                      <button className="p-2 text-slate-400 hover:text-[#7c3aed] hover:bg-indigo-50 rounded-lg transition-all">
-                        <Edit size={16} />
-                      </button>
-                      <button className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        )}
-      </main>
+          {filtered.length === 0 && (
+            <div className="p-20 text-center">
+              <p className="text-sm text-[#6b7280] font-medium">No se encontraron usuarios con esos criterios.</p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
