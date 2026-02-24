@@ -1,0 +1,173 @@
+/* Sistema de Diseño BuscArt con Tailwind CSS */
+/* Basado en los estilos del onboarding */
+
+/* Importación de fuente Plus Jakarta Sans */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* === VARIABLES CSS PERSONALIZADAS === */
+:root {
+  /* Gradientes principales */
+  --buscart-primary-start: #7c3aed;
+  --buscart-primary-end: #2563eb;
+  --buscart-primary-dark: #5b21b6;
+  
+  /* Easing functions personalizadas */
+  --buscart-ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --buscart-ease-in-out: cubic-bezier(0.445, 0.05, 0.55, 0.95);
+  --buscart-ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* === ESTILOS BASE === */
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+
+  body {
+    @apply bg-gradient-to-br from-violet-50 via-violet-100 to-violet-200;
+    @apply text-text-primary;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Scrollbar personalizado */
+  .scrollbar-buscart {
+    @apply scrollbar-thin scrollbar-track-transparent scrollbar-thumb-violet-300 hover:scrollbar-thumb-violet-500;
+  }
+}
+
+/* === COMPONENTES PERSONALIZADOS === */
+@layer components {
+  /* Tarjeta glass */
+  .card-glass {
+    @apply glass-card;
+  }
+
+  /* Botón primario */
+  .btn-primary {
+    @apply btn-buscart;
+  }
+
+  /* Botón secundario */
+  .btn-secondary {
+    @apply bg-white bg-opacity-80 border-2 border-violet-300 text-violet-600 font-semibold px-5 py-3 rounded-2xl transition-all duration-300 hover:bg-white hover:border-violet-500 hover:shadow-buscart-sm cursor-pointer;
+  }
+
+  /* Input field */
+  .input-field {
+    @apply input-buscart;
+  }
+
+  /* Pill/Chip */
+  .pill {
+    @apply pill-buscart;
+  }
+
+  /* Texto con gradiente */
+  .text-gradient {
+    @apply text-gradient;
+  }
+
+  /* Títulos */
+  .title-main {
+    @apply text-4xl font-extrabold text-text-primary leading-tight tracking-tight;
+  }
+
+  .title-secondary {
+    @apply text-2xl font-bold text-text-primary leading-normal;
+  }
+
+  .text-body {
+    @apply text-base font-normal text-text-secondary leading-normal;
+  }
+
+  .text-caption {
+    @apply text-sm font-normal text-text-muted leading-normal;
+  }
+
+  /* Animaciones personalizadas */
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.3s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}
+
+/* === UTILIDADES PERSONALIZADAS === */
+@layer utilities {
+  /* Efectos de hover personalizados */
+  .hover-lift {
+    @apply transition-transform duration-300 hover:-translate-y-1;
+  }
+
+  .hover-glow {
+    @apply transition-all duration-300 hover:shadow-buscart-lg;
+  }
+
+  /* Animaciones condicionales */
+  .animate-on-scroll {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s var(--buscart-ease-out);
+  }
+
+  .animate-on-scroll.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Estados de carga */
+  .loading-skeleton {
+    @apply animate-pulse bg-violet-100 rounded;
+  }
+
+  /* Responsive text */
+  .responsive-text {
+    @apply text-4xl md:text-5xl lg:text-6xl;
+  }
+
+  /* Glass morphism utilities */
+  .glass-morphism {
+    @apply glass-bg;
+  }
+
+  .glass-card-hover {
+    @apply glass-card hover:glass-card-hover;
+  }
+}
+
+/* === ESTILOS ADICIONALES DEL PROYECTO === */
+/* Aquí pueden ir estilos específicos que no cubre Tailwind */

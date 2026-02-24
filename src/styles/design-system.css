@@ -1,0 +1,598 @@
+/* Sistema de Diseño BuscArt - Basado en Onboarding */
+/* Archivo: design-system.css - Tokens y utilidades completas */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+/* ========================================
+   TOKENS DE COLOR - SISTEMA COMPLETO
+   ======================================== */
+:root {
+  /* Gradientes Principales BuscArt */
+  --buscart-primary-start: #7c3aed;
+  --buscart-primary-end: #2563eb;
+  --buscart-primary-dark: #5b21b6;
+  --buscart-primary-darker: #1d4ed8;
+  
+  /* Paleta Violeta Completa */
+  --buscart-violet-50: #f8f6ff;
+  --buscart-violet-100: #f0edff;
+  --buscart-violet-200: #eef2ff;
+  --buscart-violet-300: #ede9fe;
+  --buscart-violet-400: #ddd6fe;
+  --buscart-violet-500: #c4b5fd;
+  --buscart-violet-600: #a78bfa;
+  --buscart-violet-700: #818cf8;
+  --buscart-violet-800: #7c3aed;
+  --buscart-violet-900: #6d28d9;
+  --buscart-violet-950: #4c1d95;
+  
+  /* Paleta Azul Completa */
+  --buscart-blue-400: #93c5fd;
+  --buscart-blue-500: #60a5fa;
+  --buscart-blue-600: #2563eb;
+  --buscart-blue-700: #1d4ed8;
+  --buscart-blue-800: #1e40af;
+  
+  /* Colores de Fondo - Glassmorphism */
+  --buscart-bg-primary: linear-gradient(135deg, #f8f6ff 0%, #f0edff 50%, #eef2ff 100%);
+  --buscart-bg-light: rgba(248, 246, 255, 0.98);
+  --buscart-bg-medium: rgba(238, 242, 255, 0.98);
+  --buscart-bg-card: rgba(255, 255, 255, 0.72);
+  --buscart-bg-card-hover: rgba(255, 255, 255, 0.88);
+  --buscart-bg-glass: rgba(255, 255, 255, 0.25);
+  --buscart-bg-glass-strong: rgba(255, 255, 255, 0.88);
+  --buscart-bg-input: rgba(255, 255, 255, 0.75);
+  
+  /* Colores de Texto */
+  --buscart-text-primary: #1e1b4b;
+  --buscart-text-secondary: #6d28d9;
+  --buscart-text-muted: rgba(109, 40, 217, 0.5);
+  --buscart-text-light: rgba(109, 40, 217, 0.7);
+  --buscart-text-white: #ffffff;
+  --buscart-text-success: #10b981;
+  --buscart-text-warning: #f59e0b;
+  --buscart-text-error: #ef4444;
+  
+  /* Bordes */
+  --buscart-border-light: rgba(124, 58, 237, 0.15);
+  --buscart-border-medium: rgba(124, 58, 237, 0.25);
+  --buscart-border-strong: rgba(167, 139, 250, 0.35);
+  --buscart-border-white: rgba(255, 255, 255, 0.9);
+  --buscart-border-glass: rgba(255, 255, 255, 0.8);
+  --buscart-border-input: rgba(167, 139, 250, 0.25);
+  
+  /* Sombras - Sistema Completo */
+  --buscart-shadow-xs: 0 1px 2px 0 rgba(124, 58, 237, 0.05);
+  --buscart-shadow-sm: 0 2px 4px -2px rgba(124, 58, 237, 0.1);
+  --buscart-shadow-md: 0 4px 8px -2px rgba(124, 58, 237, 0.1);
+  --buscart-shadow-lg: 0 4px 16px -4px rgba(124, 58, 237, 0.12);
+  --buscart-shadow-xl: 0 8px 24px -6px rgba(124, 58, 237, 0.15);
+  --buscart-shadow-2xl: 0 12px 32px -8px rgba(124, 58, 237, 0.2);
+  --buscart-shadow-card: 0 4px 20px -6px rgba(124, 58, 237, 0.12);
+  --buscart-shadow-hover: 0 8px 24px -6px rgba(124, 58, 237, 0.2);
+  --buscart-shadow-focus: 0 0 0 3px rgba(124, 58, 237, 0.1);
+  --buscart-shadow-dark: 0 10px 20px -6px rgba(91, 33, 182, 0.28);
+  
+  /* Blur Effects */
+  --buscart-blur-xs: blur(4px);
+  --buscart-blur-sm: blur(8px);
+  --buscart-blur-md: blur(16px);
+  --buscart-blur-lg: blur(24px);
+  --buscart-blur-xl: blur(32px);
+  
+  /* Overlays y Decorativos */
+  --buscart-noise-overlay: rgba(255, 255, 255, 0.18);
+  --buscart-highlight: rgba(255, 255, 255, 0.95);
+  --buscart-highlight-subtle: rgba(255, 255, 255, 0.7);
+}
+
+/* ========================================
+   TOKENS DE TIPOGRAFÍA
+   ======================================== */
+:root {
+  --buscart-font-family: 'Plus Jakarta Sans', sans-serif;
+  --buscart-font-size-xs: 10px;
+  --buscart-font-size-sm: 12px;
+  --buscart-font-size-base: 14px;
+  --buscart-font-size-lg: 16px;
+  --buscart-font-size-xl: 18px;
+  --buscart-font-size-2xl: 20px;
+  --buscart-font-size-3xl: 24px;
+  --buscart-font-size-4xl: 28px;
+  --buscart-font-size-5xl: 32px;
+  
+  --buscart-font-weight-normal: 400;
+  --buscart-font-weight-medium: 500;
+  --buscart-font-weight-semibold: 600;
+  --buscart-font-weight-bold: 700;
+  --buscart-font-weight-extrabold: 800;
+  
+  --buscart-line-height-tight: 1.2;
+  --buscart-line-height-normal: 1.5;
+  --buscart-line-height-relaxed: 1.75;
+  
+  --buscart-letter-spacing-tight: -0.5px;
+  --buscart-letter-spacing-normal: 0;
+  --buscart-letter-spacing-wide: 0.3px;
+  --buscart-letter-spacing-wider: 0.5px;
+}
+
+/* ========================================
+   TOKENS DE ESPACIADO
+   ======================================== */
+:root {
+  --buscart-spacing-xs: 4px;
+  --buscart-spacing-sm: 8px;
+  --buscart-spacing-md: 12px;
+  --buscart-spacing-lg: 16px;
+  --buscart-spacing-xl: 20px;
+  --buscart-spacing-2xl: 24px;
+  --buscart-spacing-3xl: 32px;
+  --buscart-spacing-4xl: 40px;
+  --buscart-spacing-5xl: 48px;
+  --buscart-spacing-6xl: 64px;
+}
+
+/* ========================================
+   TOKENS DE BORDES
+   ======================================== */
+:root {
+  --buscart-radius-xs: 4px;
+  --buscart-radius-sm: 8px;
+  --buscart-radius-md: 10px;
+  --buscart-radius-lg: 12px;
+  --buscart-radius-xl: 14px;
+  --buscart-radius-2xl: 16px;
+  --buscart-radius-3xl: 18px;
+  --buscart-radius-4xl: 20px;
+  --buscart-radius-5xl: 22px;
+  --buscart-radius-6xl: 24px;
+  --buscart-radius-7xl: 28px;
+  --buscart-radius-full: 50%;
+}
+
+/* ========================================
+   TOKENS DE ANIMACIÓN
+   ======================================== */
+:root {
+  --buscart-duration-fast: 150ms;
+  --buscart-duration-normal: 250ms;
+  --buscart-duration-slow: 350ms;
+  --buscart-duration-slower: 450ms;
+  --buscart-duration-slowest: 600ms;
+  
+  --buscart-ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --buscart-ease-in-out: cubic-bezier(0.445, 0.05, 0.55, 0.95);
+  --buscart-ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* ========================================
+   UTILIDADES DE GRADIENTES
+   ======================================== */
+.buscart-gradient {
+  background: linear-gradient(135deg, var(--buscart-primary-start) 0%, var(--buscart-primary-end) 100%);
+}
+
+.buscart-gradient-text {
+  background: linear-gradient(135deg, var(--buscart-primary-start) 0%, var(--buscart-primary-end) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.buscart-gradient-vertical {
+  background: linear-gradient(180deg, var(--buscart-primary-start) 0%, var(--buscart-primary-end) 100%);
+}
+
+.buscart-gradient-reverse {
+  background: linear-gradient(135deg, var(--buscart-primary-end) 0%, var(--buscart-primary-start) 100%);
+}
+
+/* ========================================
+   UTILIDADES DE GLASSMORPHISM
+   ======================================== */
+.buscart-glass-bg {
+  background: var(--buscart-bg-primary);
+  backdrop-filter: var(--buscart-blur-lg);
+  -webkit-backdrop-filter: var(--buscart-blur-lg);
+}
+
+.buscart-card-glass {
+  background: var(--buscart-bg-card);
+  border: 1px solid var(--buscart-border-white);
+  backdrop-filter: var(--buscart-blur-sm);
+  -webkit-backdrop-filter: var(--buscart-blur-sm);
+  transition: all var(--buscart-duration-normal) var(--buscart-ease-out);
+}
+
+.buscart-card-glass:hover {
+  background: var(--buscart-bg-card-hover);
+  box-shadow: var(--buscart-shadow-hover);
+  transform: translateY(-2px);
+}
+
+.buscart-glass-strong {
+  background: var(--buscart-bg-glass-strong);
+  border: 1px solid var(--buscart-border-white);
+  backdrop-filter: var(--buscart-blur-md);
+  -webkit-backdrop-filter: var(--buscart-blur-md);
+}
+
+.buscart-glass-light {
+  background: var(--buscart-bg-glass);
+  border: 1px solid var(--buscart-border-glass);
+  backdrop-filter: var(--buscart-blur-xs);
+  -webkit-backdrop-filter: var(--buscart-blur-xs);
+}
+
+/* ========================================
+   UTILIDADES DE TARJETAS
+   ======================================== */
+.buscart-card {
+  background: var(--buscart-bg-card);
+  border: 1px solid var(--buscart-border-white);
+  border-radius: var(--buscart-radius-5xl);
+  box-shadow: var(--buscart-shadow-card);
+  transition: all var(--buscart-duration-normal) var(--buscart-ease-out);
+}
+
+.buscart-card:hover {
+  box-shadow: var(--buscart-shadow-hover);
+  transform: translateY(-2px);
+}
+
+.buscart-card-dark {
+  background: var(--buscart-gradient);
+  border-radius: var(--buscart-radius-7xl);
+  box-shadow: var(--buscart-shadow-dark);
+}
+
+.buscart-card-input {
+  background: var(--buscart-bg-input);
+  border: 1.5px solid var(--buscart-border-input);
+  border-radius: var(--buscart-radius-xl);
+  transition: all var(--buscart-duration-fast) var(--buscart-ease-out);
+}
+
+.buscart-card-input:focus {
+  border-color: var(--buscart-primary-start);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: var(--buscart-shadow-focus);
+}
+
+/* ========================================
+   UTILIDADES DE BOTONES
+   ======================================== */
+.buscart-btn-primary {
+  background: var(--buscart-gradient);
+  border: none;
+  border-radius: var(--buscart-radius-xl);
+  color: var(--buscart-text-white);
+  font-weight: var(--buscart-font-weight-bold);
+  padding: var(--buscart-spacing-lg) var(--buscart-spacing-2xl);
+  transition: all var(--buscart-duration-normal) var(--buscart-ease-out);
+  box-shadow: var(--buscart-shadow-md);
+  cursor: pointer;
+  font-family: var(--buscart-font-family);
+}
+
+.buscart-btn-primary:hover {
+  box-shadow: var(--buscart-shadow-xl);
+  transform: translateY(-1px);
+}
+
+.buscart-btn-primary:disabled {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.3), rgba(37, 99, 235, 0.3));
+  opacity: 0.6;
+  transform: none;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.buscart-btn-secondary {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1.5px solid var(--buscart-border-medium);
+  border-radius: var(--buscart-radius-xl);
+  color: var(--buscart-primary-start);
+  font-weight: var(--buscart-font-weight-semibold);
+  padding: var(--buscart-spacing-lg) var(--buscart-spacing-xl);
+  transition: all var(--buscart-duration-normal) var(--buscart-ease-out);
+  cursor: pointer;
+  font-family: var(--buscart-font-family);
+}
+
+.buscart-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: var(--buscart-primary-start);
+  box-shadow: var(--buscart-shadow-sm);
+}
+
+/* ========================================
+   UTILIDADES DE PILLS/CHIPS
+   ======================================== */
+.buscart-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--buscart-spacing-sm) var(--buscart-spacing-lg);
+  border-radius: var(--buscart-radius-full);
+  font-size: var(--buscart-font-size-sm);
+  font-weight: var(--buscart-font-weight-semibold);
+  transition: all var(--buscart-duration-fast) var(--buscart-ease-out);
+  cursor: pointer;
+  font-family: var(--buscart-font-family);
+}
+
+.buscart-pill-normal {
+  background: rgba(255, 255, 255, 0.75);
+  border: 1.5px solid var(--buscart-border-medium);
+  color: var(--buscart-violet-950);
+}
+
+.buscart-pill-selected {
+  background: var(--buscart-gradient);
+  border: 1.5px solid transparent;
+  color: var(--buscart-text-white);
+  box-shadow: var(--buscart-shadow-md);
+}
+
+/* ========================================
+   UTILIDADES DE INPUTS
+   ======================================== */
+.buscart-input {
+  background: var(--buscart-bg-input);
+  border: 1.5px solid var(--buscart-border-input);
+  border-radius: var(--buscart-radius-xl);
+  padding: var(--buscart-spacing-lg) var(--buscart-spacing-lg);
+  font-family: var(--buscart-font-family);
+  font-size: var(--buscart-font-size-base);
+  color: var(--buscart-text-primary);
+  transition: all var(--buscart-duration-fast) var(--buscart-ease-out);
+  outline: none;
+}
+
+.buscart-input:focus {
+  border-color: var(--buscart-primary-start);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: var(--buscart-shadow-focus);
+}
+
+.buscart-input::placeholder {
+  color: rgba(124, 58, 237, 0.28);
+}
+
+/* ========================================
+   OVERLAYS DECORATIVOS
+   ======================================== */
+.buscart-noise {
+  position: absolute;
+  inset: 0;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.buscart-highlight {
+  position: absolute;
+  top: 0;
+  left: 1px;
+  right: 1px;
+  height: 1px;
+  background: var(--buscart-highlight);
+  border-radius: inherit;
+}
+
+.buscart-blob {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.5;
+  filter: blur(40px);
+}
+
+/* ========================================
+   TIPOGRAFÍA HELPER
+   ======================================== */
+.buscart-text-title {
+  font-family: var(--buscart-font-family);
+  font-size: var(--buscart-font-size-4xl);
+  font-weight: var(--buscart-font-weight-extrabold);
+  color: var(--buscart-text-primary);
+  line-height: var(--buscart-line-height-tight);
+  letter-spacing: var(--buscart-letter-spacing-tight);
+  margin: 0;
+}
+
+.buscart-text-subtitle {
+  font-family: var(--buscart-font-family);
+  font-size: var(--buscart-font-size-2xl);
+  font-weight: var(--buscart-font-weight-bold);
+  color: var(--buscart-text-primary);
+  line-height: var(--buscart-line-height-normal);
+  margin: 0;
+}
+
+.buscart-text-body {
+  font-family: var(--buscart-font-family);
+  font-size: var(--buscart-font-size-base);
+  font-weight: var(--buscart-font-weight-normal);
+  color: var(--buscart-text-secondary);
+  line-height: var(--buscart-line-height-normal);
+  margin: 0;
+}
+
+.buscart-text-caption {
+  font-family: var(--buscart-font-family);
+  font-size: var(--buscart-font-size-sm);
+  font-weight: var(--buscart-font-weight-normal);
+  color: var(--buscart-text-muted);
+  line-height: var(--buscart-line-height-normal);
+  margin: 0;
+}
+
+/* ========================================
+   ESTILOS BASE
+   ======================================== */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--buscart-font-family);
+  margin: 0;
+  padding: 0;
+  background: var(--buscart-bg-primary);
+  color: var(--buscart-text-primary);
+  line-height: var(--buscart-line-height-normal);
+}
+
+/* ========================================
+   SCROLLBAR PERSONALIZADO
+   ======================================== */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(124, 58, 237, 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(124, 58, 237, 0.5);
+}
+
+/* ========================================
+   FOCUS STATES ACCESIBLES
+   ======================================== */
+.buscart-focus-ring:focus {
+  outline: 2px solid var(--buscart-primary-start);
+  outline-offset: 2px;
+}
+
+.buscart-focus-ring:focus-visible {
+  outline: 2px solid var(--buscart-primary-start);
+  outline-offset: 2px;
+}
+
+/* ========================================
+   ANIMACIONES KEYFRAMES
+   ======================================== */
+@keyframes buscart-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes buscart-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes buscart-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes buscart-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* ========================================
+   UTILIDADES DE ANIMACIÓN
+   ======================================== */
+.buscart-animate-fade-in {
+  animation: buscart-fade-in var(--buscart-duration-slower) var(--buscart-ease-out) forwards;
+}
+
+.buscart-animate-scale-in {
+  animation: buscart-scale-in var(--buscart-duration-normal) var(--buscart-ease-out) forwards;
+}
+
+.buscart-animate-slide-up {
+  animation: buscart-slide-up var(--buscart-duration-slow) var(--buscart-ease-out) forwards;
+}
+
+.buscart-animate-pulse {
+  animation: buscart-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ========================================
+   UTILIDADES RÁPIDAS
+   ======================================== */
+/* Texto */
+.buscart-text-center { text-align: center; }
+.buscart-text-left { text-align: left; }
+.buscart-text-right { text-align: right; }
+
+/* Flexbox */
+.buscart-flex { display: flex; }
+.buscart-flex-col { flex-direction: column; }
+.buscart-items-center { align-items: center; }
+.buscart-justify-center { justify-content: center; }
+.buscart-justify-between { justify-content: space-between; }
+
+/* Display */
+.buscart-hidden { display: none; }
+.buscart-block { display: block; }
+.buscart-inline-block { display: inline-block; }
+
+/* Posición */
+.buscart-relative { position: relative; }
+.buscart-absolute { position: absolute; }
+.buscart-fixed { position: fixed; }
+
+/* Dimensiones */
+.buscart-w-full { width: 100%; }
+.buscart-h-full { height: 100%; }
+
+/* Overflow */
+.buscart-overflow-hidden { overflow: hidden; }
+.buscart-overflow-scroll { overflow: scroll; }
+.buscart-overflow-auto { overflow: auto; }
+
+/* ========================================
+   RESPONSIVE HELPER
+   ======================================== */
+@media (max-width: 768px) {
+  :root {
+    --buscart-font-size-4xl: 24px;
+    --buscart-font-size-3xl: 20px;
+    --buscart-spacing-4xl: 32px;
+    --buscart-spacing-3xl: 24px;
+  }
+}
+
+/* ========================================
+   DARK MODE PLACEHOLDER
+   ======================================== */
+@media (prefers-color-scheme: dark) {
+  /* Variables para modo oscuro cuando se implemente */
+  /* --buscart-bg-primary: ... */
+  /* --buscart-text-primary: ... */
+}
