@@ -4,8 +4,9 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, Mic2, FileText, Users, Settings, Music2,
   Building, CalendarCheck, MapPin, Megaphone, Shield, ChevronRight,
-  Scale
+  Scale, Plus
 } from 'lucide-react'
+import { LogoStyles } from '@/theme/brand'
 
 const navSections = [
   {
@@ -15,25 +16,26 @@ const navSections = [
   {
     label: 'Gestión',
     items: [
-      { href: '/artistas', label: 'Artistas', icon: Mic2 },
-      { href: '/contratos', label: 'Contratos', icon: FileText },
-      { href: '/usuarios', label: 'Usuarios', icon: Users },
-      { href: '/empresas', label: 'Empresas', icon: Building },
+      { href: '/artists', label: 'Artistas', icon: Mic2 },
+      { href: '/contracts', label: 'Contratos', icon: FileText },
+      { href: '/users', label: 'Usuarios', icon: Users },
+      { href: '/companies', label: 'Empresas', icon: Building },
+      { href: '/companies/create', label: 'Crear Empresa', icon: Plus },
     ],
   },
   {
     label: 'Operaciones',
     items: [
-      { href: '/eventos-pagos', label: 'Eventos Pagos', icon: CalendarCheck },
-      { href: '/verificar-salas', label: 'Salas y Sitios', icon: MapPin },
-      { href: '/moderacion', label: 'Moderación', icon: Shield },
-      { href: '/publicidad', label: 'Publicidad', icon: Megaphone },
-      { href: '/disputas', label: 'Disputas', icon: Scale },
+      { href: '/payment-events', label: 'Eventos Pagos', icon: CalendarCheck },
+      { href: '/verify-rooms', label: 'Salas y Sitios', icon: MapPin },
+      { href: '/moderation', label: 'Moderación', icon: Shield },
+      { href: '/advertising', label: 'Publicidad', icon: Megaphone },
+      { href: '/disputes', label: 'Disputas', icon: Scale },
     ],
   },
   {
     label: 'Sistema',
-    items: [{ href: '/configuracion', label: 'Configuración', icon: Settings }],
+    items: [{ href: '/configuration', label: 'Configuración', icon: Settings }],
   },
 ]
 
@@ -43,23 +45,17 @@ export default function Sidebar() {
   return (
     <aside className="fixed inset-y-0 left-0 w-[280px] bg-white/95 backdrop-blur-xl border-r border-[#7c3aed21] shadow-[2px_0_20px_rgba(124,58,237,0.06)] flex flex-col z-40 font-sans overflow-hidden transition-transform duration-300 -translate-x-full md:translate-x-0">
       
-      {/* Blobs Decorativos Animados */}
-      <div className="absolute -top-20 -right-16 w-[220px] h-[220px] rounded-full bg-gradient-to-br from-[#7c3aed12] to-transparent pointer-events-none animate-pulse" />
-      <div className="absolute -bottom-16 -left-10 w-[170px] h-[170px] rounded-full bg-gradient-to-br from-[#2563eb0d] to-transparent pointer-events-none animate-pulse" />
-
       {/* Logo Container */}
       <div className="h-[76px] px-[22px] flex items-center gap-3.5 border-b border-[#7c3aed21] shrink-0 relative z-10">
-        <div className="w-[42px] h-[42px] rounded-[13px] bg-gradient-to-br from-[#7c3aed] to-[#2563eb] flex items-center justify-center text-white shadow-[0_6px_18px_rgba(124,58,237,0.22)]">
-          <Music2 size={20} />
+        <div style={LogoStyles.container}>
+          <span style={LogoStyles.buscText}>Busc</span>
+          <span style={LogoStyles.artBackground}>
+            <span style={LogoStyles.artText}>Art</span>
+          </span>
         </div>
-        <div>
-          <h1 className="text-[1.35rem] font-extrabold leading-none tracking-tight bg-gradient-to-br from-[#7c3aed] to-[#2563eb] bg-clip-text text-transparent">
-            BuscArt
-          </h1>
-          <p className="text-[0.67rem] font-bold text-[#8b5cf6] mt-1 tracking-widest uppercase">
-            Panel de Control
-          </p>
-        </div>
+        <p className="text-[0.67rem] font-bold text-[#8b5cf6] mt-1 tracking-widest uppercase">
+          Panel de Control
+        </p>
       </div>
 
       {/* Navigation */}

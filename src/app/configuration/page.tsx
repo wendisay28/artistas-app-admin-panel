@@ -1,4 +1,4 @@
-// src/app/configuracion/page.tsx
+// src/app/configuration/page.tsx
 import Header from '@/components/Header'
 import { Bell, Shield, Globe, CreditCard, Save } from 'lucide-react'
 

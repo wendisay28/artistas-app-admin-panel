@@ -1,4 +1,4 @@
-// src/app/contratos/page.tsx
+// src/app/contracts/page.tsx
 'use client'
 
 import { useState } from 'react'

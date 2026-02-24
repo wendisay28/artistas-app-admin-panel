@@ -92,7 +92,7 @@ export default function DashboardPage() {
                 <h2 className="text-lg font-bold text-[#1e1b4b]">Contratos recientes</h2>
                 <p className="text-sm text-[#8b5cf6] mt-1">Últimas transacciones en la plataforma</p>
               </div>
-              <a href="/contratos" className="text-sm text-[#7c3aed] hover:text-[#5b21b6] transition-colors">
+              <a href="/contracts" className="text-sm text-[#7c3aed] hover:text-[#5b21b6] transition-colors">
                 Ver todos
               </a>
             </div>
