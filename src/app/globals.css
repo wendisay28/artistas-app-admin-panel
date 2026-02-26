@@ -41,7 +41,25 @@
 
   /* Scrollbar personalizado */
   .scrollbar-buscart {
-    @apply scrollbar-thin scrollbar-track-transparent scrollbar-thumb-violet-300 hover:scrollbar-thumb-violet-500;
+    scrollbar-width: thin;
+    scrollbar-color: rgb(196 181 258) transparent;
+  }
+  
+  .scrollbar-buscart::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .scrollbar-buscart::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .scrollbar-buscart::-webkit-scrollbar-thumb {
+    background-color: rgb(196 181 258);
+    border-radius: 3px;
+  }
+  
+  .scrollbar-buscart::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(139 92 246);
   }
 }
 

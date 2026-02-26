@@ -11,11 +11,9 @@ import {
   AlertCircle, 
   CalendarCheck, 
   MapPin, 
-  User, 
   Clock, 
-  DollarSign,
   Tag,
-  BarChart3
+  DollarSign
 } from 'lucide-react'
 
 // --- INTERFACES ---
@@ -75,47 +73,41 @@ export default function EventosPagosPage() {
     <div className="min-h-screen bg-[#f8f6ff] pb-12">
       <Header title="Control de Taquilla" subtitle="Validación y monitoreo de eventos comerciales" />
 
-      <div className="px-6 py-8 flex flex-col gap-6">
+      <div className="px-6 py-8 flex flex-col gap-5">
         
-        {/* Stats Cards - Unificadas con tu estilo */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-2xl border border-[#7c3aed1a] shadow-sm">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-xs font-bold text-[#6b7280] uppercase">Ingresos Estimados</p>
-                <h3 className="text-2xl font-black text-[#1e1b4b] mt-1">${stats.recaudado.toLocaleString()}</h3>
-              </div>
-              <div className="p-3 bg-[#f0edff] rounded-xl text-[#7c3aed]"><TrendingUp size={20} /></div>
+        {/* Resumen rápido - Alineado con Artistas */}
+        <div className="flex gap-4">
+            <div className="bg-white px-4 py-2 rounded-xl border border-[#7c3aed1a] shadow-sm flex items-center gap-3">
+                <div>
+                  <span className="text-xs text-[#6b7280] block">Ingresos Estimados</span>
+                  <span className="text-lg font-bold text-[#1e1b4b]">${stats.recaudado.toLocaleString()}</span>
+                </div>
+                <div className="p-2 bg-[#f0edff] rounded-lg text-[#7c3aed]"><TrendingUp size={16} /></div>
             </div>
-          </div>
-          <div className="bg-white p-6 rounded-2xl border border-[#7c3aed1a] shadow-sm">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-xs font-bold text-[#6b7280] uppercase">Pendientes Acción</p>
-                <h3 className="text-2xl font-black text-[#d97706] mt-1">{stats.pendientes}</h3>
-              </div>
-              <div className="p-3 bg-[#fffbeb] rounded-xl text-[#d97706]"><AlertCircle size={20} /></div>
+            <div className="bg-white px-4 py-2 rounded-xl border border-[#7c3aed1a] shadow-sm flex items-center gap-3">
+                <div>
+                  <span className="text-xs text-[#6b7280] block">Por Aprobar</span>
+                  <span className="text-lg font-bold text-[#d97706]">{stats.pendientes}</span>
+                </div>
+                <div className="p-2 bg-[#fffbeb] rounded-lg text-[#d97706]"><AlertCircle size={16} /></div>
             </div>
-          </div>
-          <div className="bg-white p-6 rounded-2xl border border-[#7c3aed1a] shadow-sm">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-xs font-bold text-[#6b7280] uppercase">Eventos Aprobados</p>
-                <h3 className="text-2xl font-black text-[#059669] mt-1">{stats.aprobados}</h3>
-              </div>
-              <div className="p-3 bg-[#ecfdf5] rounded-xl text-[#059669]"><CalendarCheck size={20} /></div>
+            <div className="bg-white px-4 py-2 rounded-xl border border-[#7c3aed1a] shadow-sm flex items-center gap-3">
+                <div>
+                  <span className="text-xs text-[#6b7280] block">Eventos OK</span>
+                  <span className="text-lg font-bold text-[#059669]">{stats.aprobados}</span>
+                </div>
+                <div className="p-2 bg-[#ecfdf5] rounded-lg text-[#059669]"><CalendarCheck size={16} /></div>
             </div>
-          </div>
         </div>
 
         {/* Toolbar */}
         <div className="flex flex-wrap justify-between items-center gap-4">
-          <div className="flex gap-2">
+          <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0">
             {['todos', 'pendiente', 'aprobado', 'rechazado'].map((f) => (
               <button
                 key={f}
                 onClick={() => setFiltroEstado(f)}
-                className={`px-4 py-1.5 text-xs font-bold rounded-full border transition-all capitalize ${
+                className={`px-4 py-1.5 text-xs font-medium rounded-full border transition-all capitalize ${
                   filtroEstado === f ? 'bg-[#7c3aed] text-white border-[#7c3aed]' : 'bg-white text-[#6b7280] border-[#e5e7eb] hover:bg-gray-50'
                 }`}
               >
@@ -128,26 +120,29 @@ export default function EventosPagosPage() {
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9ca3af]" />
             <input
               type="text"
-              placeholder="Buscar evento u organizador..."
+              placeholder="Buscar evento..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 pr-4 py-2 text-sm border border-[#e5e7eb] rounded-xl outline-none w-[280px] focus:border-[#7c3aed] focus:ring-2 focus:ring-[#7c3aed10] transition-all bg-white"
+              className="pl-9 pr-4 py-2 text-sm border border-[#e5e7eb] rounded-lg outline-none w-[260px] focus:border-[#7c3aed] focus:ring-2 focus:ring-[#7c3aed10] transition-all bg-white"
             />
           </div>
         </div>
 
-        {/* Tabla Estilo Lista */}
+        {/* Tabla Estilo Artistas */}
         <div className="bg-white border border-[#e5e7eb] rounded-2xl overflow-hidden shadow-sm">
+          <div className="px-6 py-3 border-b border-[#f3f4f6] text-sm text-[#6b7280]">
+            {filtered.length} solicitudes encontradas
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-[#f9fafb]">
-                  <th className="px-6 py-4 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Evento</th>
-                  <th className="px-6 py-4 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Categoría</th>
-                  <th className="px-6 py-4 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Ventas / Cap</th>
-                  <th className="px-6 py-4 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Precio</th>
-                  <th className="px-6 py-4 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Estado</th>
-                  <th className="px-6 py-4 text-right text-xs uppercase text-[#6b7280] font-bold tracking-wider">Acciones</th>
+                  <th className="px-6 py-3 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Evento</th>
+                  <th className="px-6 py-3 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Categoría</th>
+                  <th className="px-6 py-3 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Ventas / Cap</th>
+                  <th className="px-6 py-3 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Precio</th>
+                  <th className="px-6 py-3 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Estado</th>
+                  <th className="px-6 py-3 text-right text-xs uppercase text-[#6b7280] font-bold tracking-wider">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#f3f4f6]">
@@ -158,18 +153,18 @@ export default function EventosPagosPage() {
                       <td className="px-6 py-4">
                         <div className="flex flex-col">
                           <span className="text-sm font-bold text-[#111827] group-hover:text-[#7c3aed] transition-colors">{ev.titulo}</span>
-                          <span className="text-[11px] text-[#9ca3af]">{ev.organizador}</span>
+                          <span className="text-xs text-[#9ca3af]">{ev.organizador}</span>
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="inline-flex px-2 py-1 text-[10px] font-bold bg-[#f0edff] text-[#7c3aed] rounded-lg uppercase tracking-tight">
+                        <span className="inline-flex px-2 py-1 text-xs font-medium bg-[#f0edff] text-[#7c3aed] rounded-lg">
                           {ev.categoria}
                         </span>
                       </td>
                       <td className="px-6 py-4">
                         <div className="w-32">
                           <div className="flex justify-between text-[10px] font-bold mb-1">
-                            <span className="text-[#4b5563]">{ev.inscritos} de {ev.capacidad}</span>
+                            <span className="text-[#4b5563]">{ev.inscritos}/{ev.capacidad}</span>
                             <span className="text-[#7c3aed]">{perc.toFixed(0)}%</span>
                           </div>
                           <div className="h-1.5 w-full bg-[#f3f4f6] rounded-full overflow-hidden">
@@ -177,9 +172,9 @@ export default function EventosPagosPage() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-sm font-bold text-[#111827]">${ev.precio}</td>
+                      <td className="px-6 py-4 text-sm font-medium text-[#111827]">${ev.precio}</td>
                       <td className="px-6 py-4">
-                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter ${statusConfig[ev.estado].className}`}>
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${statusConfig[ev.estado].className}`}>
                           {statusConfig[ev.estado].label}
                         </span>
                       </td>
@@ -187,14 +182,14 @@ export default function EventosPagosPage() {
                         <div className="flex justify-end gap-1">
                           <button 
                             onClick={() => { setSelectedEvento(ev); setShowModal(true); }}
-                            className="p-2 text-[#9ca3af] hover:text-[#7c3aed] hover:bg-white rounded-lg transition-all"
+                            className="p-1.5 rounded-md text-[#9ca3af] hover:bg-white hover:text-[#7c3aed] hover:shadow-sm transition-all"
                           >
                             <Eye size={16} />
                           </button>
                           {ev.estado === 'pendiente' && (
                             <button 
                               onClick={() => updateEstado(ev.id, 'aprobado')}
-                              className="p-2 text-[#9ca3af] hover:text-[#059669] hover:bg-white rounded-lg transition-all"
+                              className="p-1.5 rounded-md text-[#9ca3af] hover:bg-white hover:text-[#059669] hover:shadow-sm transition-all"
                             >
                               <Check size={16} />
                             </button>
@@ -210,37 +205,40 @@ export default function EventosPagosPage() {
         </div>
       </div>
 
-      {/* Modal de Detalle */}
+      {/* Modal - Ajustado a estilo moderno */}
       {showModal && selectedEvento && (
         <div className="fixed inset-0 bg-[#1e1b4b]/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-[2rem] max-w-lg w-full shadow-2xl overflow-hidden border border-[#7c3aed1a]">
+          <div className="bg-white rounded-2xl max-w-lg w-full shadow-xl overflow-hidden border border-[#e5e7eb]">
             <div className="p-8">
               <div className="flex justify-between items-start mb-6">
-                <div className="p-3 bg-[#f0edff] text-[#7c3aed] rounded-2xl"><Tag size={24} /></div>
+                <div className="p-3 bg-[#f0edff] text-[#7c3aed] rounded-xl"><Tag size={20} /></div>
                 <button onClick={() => setShowModal(false)} className="text-[#9ca3af] hover:text-[#111827]"><X size={20} /></button>
               </div>
-              <h3 className="text-xl font-black text-[#1e1b4b] leading-tight">{selectedEvento.titulo}</h3>
-              <p className="text-xs font-bold text-[#7c3aed] uppercase mt-1 tracking-wider">{selectedEvento.organizador}</p>
+              <h3 className="text-lg font-bold text-[#1e1b4b]">{selectedEvento.titulo}</h3>
+              <p className="text-sm font-medium text-[#7c3aed] mt-1">{selectedEvento.organizador}</p>
               
-              <div className="grid grid-cols-2 gap-4 my-6">
-                <div className="flex flex-col gap-1">
-                  <span className="text-[10px] font-bold text-[#9ca3af] uppercase">Ubicación</span>
-                  <span className="text-xs font-bold text-[#4b5563] flex items-center gap-1"><MapPin size={12}/> {selectedEvento.ubicacion}</span>
+              <div className="grid grid-cols-2 gap-4 my-6 py-4 border-y border-[#f3f4f6]">
+                <div>
+                  <span className="text-[10px] font-bold text-[#9ca3af] uppercase block">Ubicación</span>
+                  <span className="text-sm font-medium text-[#4b5563] flex items-center gap-1 mt-1"><MapPin size={14}/> {selectedEvento.ubicacion}</span>
                 </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-[10px] font-bold text-[#9ca3af] uppercase">Horario</span>
-                  <span className="text-xs font-bold text-[#4b5563] flex items-center gap-1"><Clock size={12}/> {selectedEvento.fecha} @ {selectedEvento.hora}</span>
+                <div>
+                  <span className="text-[10px] font-bold text-[#9ca3af] uppercase block">Fecha y Hora</span>
+                  <span className="text-sm font-medium text-[#4b5563] flex items-center gap-1 mt-1"><Clock size={14}/> {selectedEvento.fecha}</span>
                 </div>
               </div>
 
-              <div className="bg-[#f9fafb] p-4 rounded-2xl mb-6 text-xs text-[#6b7280] leading-relaxed">
-                {selectedEvento.descripcion}
+              <div className="mb-6">
+                <span className="text-[10px] font-bold text-[#9ca3af] uppercase block mb-2">Descripción</span>
+                <p className="text-sm text-[#6b7280] leading-relaxed bg-[#f9fafb] p-4 rounded-xl">
+                  {selectedEvento.descripcion}
+                </p>
               </div>
 
               {selectedEvento.estado === 'pendiente' && (
                 <div className="flex gap-3">
-                  <button onClick={() => updateEstado(selectedEvento.id, 'aprobado')} className="flex-1 py-3 bg-[#7c3aed] text-white font-bold rounded-xl hover:bg-[#5b21b6] transition-all">Aprobar Evento</button>
-                  <button onClick={() => updateEstado(selectedEvento.id, 'rechazado')} className="px-6 py-3 border border-red-100 text-red-500 font-bold rounded-xl hover:bg-red-50 transition-all">Rechazar</button>
+                  <button onClick={() => updateEstado(selectedEvento.id, 'aprobado')} className="flex-1 py-2.5 bg-[#7c3aed] text-white text-sm font-bold rounded-lg hover:bg-[#5b21b6] transition-all">Aprobar Evento</button>
+                  <button onClick={() => updateEstado(selectedEvento.id, 'rechazado')} className="px-6 py-2.5 border border-[#e5e7eb] text-red-500 text-sm font-bold rounded-lg hover:bg-red-50 transition-all">Rechazar</button>
                 </div>
               )}
             </div>

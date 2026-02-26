@@ -1,3 +1,5 @@
+'use client'
+
 import { Bell, Search, Plus, Command } from 'lucide-react'
 
 interface HeaderProps {

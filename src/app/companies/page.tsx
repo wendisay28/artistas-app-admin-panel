@@ -1,136 +1,169 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
-import Link from 'next/link' 
-import { 
-  Building, 
-  Plus, 
-  Eye, 
-  EyeOff, 
-  Copy, 
-  Check, 
-  X, 
-  Search, 
-  ShieldCheck, 
-  ShieldAlert, 
-  Clock,
-  MoreVertical
-} from 'lucide-react'
+import { Plus, Search, MapPin, Eye, Edit, Building, MoreVertical, Briefcase, CheckCircle } from 'lucide-react'
+import VerificationBadge from '@/components/VerificationBadge'
 
-// --- INTERFACES ---
+// Datos de ejemplo para Empresas (siguiendo tu estructura de Artistas)
 interface Empresa {
   id: string
   nombre: string
-  rfc: string
-  email: string
-  telefono: string
-  direccion: string
-  estado: 'pendiente' | 'verificado' | 'suspendido'
-  fechaRegistro: string
-  usuario: string
-  contraseña: string
+  categoria: string
+  especialidad: string
+  eventos: string
+  estado: 'activo' | 'inactivo'
+  ubicacion: string
+  verificacion: 'verificado' | 'pendiente' | 'no_verificado' | 'rechazado'
 }
 
-const empresasData: Empresa[] = [
-  {
-    id: '1',
-    nombre: 'Galería Arte Moderno',
-    rfc: 'GAM200101ABC',
-    email: 'contacto@galeriamoderno.com',
-    telefono: '+52 55 1234 5678',
-    direccion: 'Ciudad de México, CDMX',
-    estado: 'verificado',
-    fechaRegistro: '2024-01-15',
-    usuario: 'galeriamoderno',
-    contraseña: 'Arte2024!'
-  },
-  // ... más datos
+const empresas: Empresa[] = [
+  { id: 'EMP-001', nombre: 'Galería Central', categoria: 'Galería de Arte', especialidad: 'Exposiciones', eventos: '12', estado: 'activo', ubicacion: 'Bogotá', verificacion: 'verificado' },
+  { id: 'EMP-002', nombre: 'Teatro Colón', categoria: 'Centro Cultural', especialidad: 'Artes Escénicas', eventos: '45', estado: 'activo', ubicacion: 'Bogotá', verificacion: 'pendiente' },
+  { id: 'EMP-003', nombre: 'Agencia Vision', categoria: 'Agencia', especialidad: 'Representación', eventos: '8', estado: 'inactivo', ubicacion: 'Medellín', verificacion: 'no_verificado' },
+  { id: 'EMP-004', nombre: 'Museo Moderno', categoria: 'Galería de Arte', especialidad: 'Contemporáneo', eventos: '30', estado: 'activo', ubicacion: 'Cali', verificacion: 'verificado' },
 ]
 
+const statusConfig: Record<string, { label: string; className: string }> = {
+  activo: { label: 'Activo', className: 'bg-[#ecfdf5] text-[#059669]' },
+  inactivo: { label: 'Inactivo', className: 'bg-[#fef2f2] text-[#dc2626]' },
+}
+
+const categoriasFiltro = ['Todos', 'Galería de Arte', 'Centro Cultural', 'Agencia']
+
 export default function EmpresasPage() {
-  const [empresas, setEmpresas] = useState<Empresa[]>(empresasData)
-  const [showPassword, setShowPassword] = useState<Record<string, boolean>>({})
-  const [copiedId, setCopiedId] = useState<string | null>(null)
-  const [searchTerm, setSearchTerm] = useState('')
+  const router = useRouter()
+  const [search, setSearch] = useState('')
+  const [catActiva, setCatActiva] = useState('Todos')
 
-  const togglePassword = (id: string) => setShowPassword(prev => ({ ...prev, [id]: !prev[id] }))
-
-  const copyCredentials = (empresa: Empresa) => {
-    navigator.clipboard.writeText(`Usuario: ${empresa.usuario}\nPass: ${empresa.contraseña}`)
-    setCopiedId(empresa.id)
-    setTimeout(() => setCopiedId(null), 2000)
-  }
+  const filtered = empresas.filter((e) => {
+    const matchSearch = e.nombre.toLowerCase().includes(search.toLowerCase()) ||
+                        e.id.toLowerCase().includes(search.toLowerCase())
+    const matchCat = catActiva === 'Todos' || e.categoria === catActiva
+    return matchSearch && matchCat
+  })
 
   return (
-    <div className="min-h-screen bg-[#fafaff]">
-      <Header 
-        title="Directorio de Empresas" 
-        subtitle="Administración de socios comerciales y control de accesos" 
-      />
+    <div className="min-h-screen bg-[#f8f6ff] pb-12">
+      <Header title="Directorio de Empresas" subtitle="Gestiona las instituciones y aliados de la red" />
 
-      <main className="p-8 max-w-7xl mx-auto space-y-6">
-        {/* BARRA DE BÚSQUEDA Y ACCIÓN */}
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 rounded-[2rem] border border-slate-100 shadow-sm">
-          <div className="relative flex-1 w-full">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-500" size={20} />
-            <input 
-              type="text" 
-              placeholder="Buscar por nombre, RFC o correo..." 
-              className="w-full pl-12 pr-4 py-3 bg-slate-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500/20 font-medium text-sm transition-all"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <Link 
-            href="/companies/create"
-            className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3.5 rounded-2xl font-black text-sm flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-100 active:scale-95"
-          >
-            <Plus size={20} strokeWidth={3} /> REGISTRAR EMPRESA
-          </Link>
+      <div className="px-6 py-8 flex flex-col gap-5">
+        
+        {/* Resumen rápido (Estilo Artistas) */}
+        <div className="flex gap-4">
+            <div className="bg-white px-4 py-2 rounded-xl border border-[#7c3aed1a] shadow-sm">
+                <span className="text-xs text-[#6b7280] block">Empresas Aliadas</span>
+                <span className="text-lg font-bold text-[#1e1b4b]">{empresas.length}</span>
+            </div>
+            <div className="bg-white px-4 py-2 rounded-xl border border-[#7c3aed1a] shadow-sm">
+                <span className="text-xs text-[#6b7280] block">Sedes Activas</span>
+                <span className="text-lg font-bold text-[#7c3aed] flex items-center gap-1">
+                    <MapPin size={16} /> {empresas.filter(e => e.estado === 'activo').length}
+                </span>
+            </div>
         </div>
 
-        {/* TABLA DE EMPRESAS */}
-        <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden">
+        {/* Barra de herramientas */}
+        <div className="flex flex-wrap justify-between items-center gap-4">
+          <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0">
+            {categoriasFiltro.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setCatActiva(cat)}
+                className={`px-4 py-1.5 text-xs font-medium rounded-full border border-[#e5e7eb] bg-white cursor-pointer transition-all ${
+                  catActiva === cat ? 'bg-[#7c3aed] text-white border-[#7c3aed]' : 'hover:bg-gray-50 text-[#6b7280]'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex gap-2">
+            <div className="relative">
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9ca3af]" />
+              <input
+                type="text"
+                placeholder="Buscar empresa..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-9 pr-4 py-2 text-sm border border-[#e5e7eb] rounded-lg outline-none w-[240px] focus:border-[#7c3aed] focus:ring-2 focus:ring-[#7c3aed10] transition-all bg-white"
+              />
+            </div>
+            <button 
+              onClick={() => router.push('/companies/create')}
+              className="flex items-center gap-2 px-4 py-2 bg-[#7c3aed] text-white text-sm font-medium rounded-lg hover:bg-[#5b21b6] transition-colors"
+            >
+              <Plus size={16} />
+              Nueva Empresa
+            </button>
+          </div>
+        </div>
+
+        {/* Tabla Estilo Artistas */}
+        <div className="bg-white border border-[#e5e7eb] rounded-2xl overflow-hidden shadow-sm">
+          <div className="px-6 py-3 border-b border-[#f3f4f6] text-sm text-[#6b7280] flex justify-between items-center">
+            <span>{filtered.length} empresas registradas</span>
+          </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-left">
+            <table className="w-full border-collapse">
               <thead>
-                <tr className="bg-slate-50/50 border-b border-slate-100">
-                  <th className="px-8 py-5 text-[10px] uppercase font-black text-slate-400 tracking-[0.2em]">Identidad</th>
-                  <th className="px-8 py-5 text-[10px] uppercase font-black text-slate-400 tracking-[0.2em]">Estado</th>
-                  <th className="px-8 py-5 text-[10px] uppercase font-black text-slate-400 tracking-[0.2em]">Acceso Seguro</th>
-                  <th className="px-8 py-5 text-[10px] uppercase font-black text-slate-400 tracking-[0.2em] text-right">Gestión</th>
+                <tr className="bg-[#f9fafb]">
+                  <th className="px-6 py-3 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">ID</th>
+                  <th className="px-6 py-3 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Empresa</th>
+                  <th className="px-6 py-3 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Categoría</th>
+                  <th className="px-6 py-3 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Ubicación</th>
+                  <th className="px-6 py-3 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Eventos</th>
+                  <th className="px-6 py-3 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Verificación</th>
+                  <th className="px-6 py-3 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Estado</th>
+                  <th className="px-6 py-3 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
-                {empresas.map((empresa) => (
-                  <tr key={empresa.id} className="group hover:bg-indigo-50/30 transition-colors">
-                    <td className="px-8 py-6">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-white group-hover:text-indigo-600 transition-all shadow-sm">
-                          <Building size={24} />
+              <tbody className="divide-y divide-[#f3f4f6]">
+                {filtered.map((e) => (
+                  <tr key={e.id} className="hover:bg-[#f8f6ff] transition-colors group">
+                    <td className="px-6 py-4 text-sm font-mono text-[#9ca3af]">{e.id}</td>
+                    <td className="px-6 py-4">
+                        <div className="flex flex-col">
+                            <span className="text-sm font-bold text-[#111827] group-hover:text-[#7c3aed] transition-colors">{e.nombre}</span>
+                            <span className="text-xs text-[#6b7280]">{e.especialidad}</span>
                         </div>
-                        <div>
-                          <p className="font-black text-slate-800 text-base">{empresa.nombre}</p>
-                          <p className="text-xs font-bold text-slate-400 tracking-tight">{empresa.rfc}</p>
+                    </td>
+                    <td className="px-6 py-4">
+                        <span className="inline-flex px-2 py-1 text-xs font-medium bg-[#f0edff] text-[#7c3aed] rounded-lg">
+                            {e.categoria}
+                        </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-[#4b5563]">
+                        <div className="flex items-center gap-1">
+                            <MapPin size={14} className="text-[#9ca3af]" />
+                            {e.ubicacion}
                         </div>
-                      </div>
                     </td>
-                    <td className="px-8 py-6">
-                       <StatusBadge estado={empresa.estado} />
+                    <td className="px-6 py-4 text-sm text-[#4b5563] font-medium">{e.eventos}</td>
+                    <td className="px-6 py-4">
+                      <VerificationBadge status={e.verificacion} size="sm" />
                     </td>
-                    <td className="px-8 py-6">
-                      <div className="inline-flex items-center gap-3 bg-white border border-slate-100 p-2 rounded-xl">
-                        <p className="text-xs font-mono font-bold text-slate-700">{empresa.usuario}</p>
-                        <button onClick={() => togglePassword(empresa.id)} className="text-indigo-400">
-                          {showPassword[empresa.id] ? <EyeOff size={14} /> : <Eye size={14} />}
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${statusConfig[e.estado].className}`}>
+                        {statusConfig[e.estado].label}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex gap-1">
+                        <button className="p-1.5 rounded-md text-[#9ca3af] hover:bg-white hover:text-[#7c3aed] hover:shadow-sm transition-all">
+                          <Eye size={16} />
                         </button>
+                        <button className="p-1.5 rounded-md text-[#9ca3af] hover:bg-white hover:text-[#7c3aed] hover:shadow-sm transition-all">
+                          <Edit size={16} />
+                        </button>
+                        {e.verificacion !== 'verificado' && (
+                          <button className="p-1.5 rounded-md text-[#9ca3af] hover:bg-white hover:text-emerald-600 hover:shadow-sm transition-all">
+                            <CheckCircle size={16} />
+                          </button>
+                        )}
                       </div>
-                    </td>
-                    <td className="px-8 py-6 text-right">
-                      <button onClick={() => copyCredentials(empresa)} className="p-3 bg-slate-50 rounded-xl">
-                        {copiedId === empresa.id ? <Check size={18} className="text-emerald-500" /> : <Copy size={18} />}
-                      </button>
                     </td>
                   </tr>
                 ))}
@@ -138,23 +171,7 @@ export default function EmpresasPage() {
             </table>
           </div>
         </div>
-      </main>
-
+      </div>
     </div>
-  )
-}
-
-function StatusBadge({ estado }: { estado: Empresa['estado'] }) {
-  const configs = {
-    verificado: { color: 'bg-emerald-50 text-emerald-600 border-emerald-100', icon: ShieldCheck, label: 'Verificado' },
-    pendiente: { color: 'bg-amber-50 text-amber-600 border-amber-100', icon: Clock, label: 'Pendiente' },
-    suspendido: { color: 'bg-slate-100 text-slate-500 border-slate-200', icon: ShieldAlert, label: 'Suspendido' },
-  }
-  const config = configs[estado]
-  const Icon = config.icon
-  return (
-    <span className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full border font-black text-[10px] uppercase tracking-wider ${config.color}`}>
-      <Icon size={14} strokeWidth={2.5} /> {config.label}
-    </span>
   )
 }

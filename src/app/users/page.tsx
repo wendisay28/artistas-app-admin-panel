@@ -12,17 +12,32 @@ import {
   Mail, 
   Plus, 
   MoreVertical,
-  UserPlus
+  UserPlus,
+  CheckCircle
 } from 'lucide-react'
+import VerificationBadge from '@/components/VerificationBadge'
+import KYCModal from '@/components/KYCModal'
 
 // --- DATOS SIMULADOS ---
-const usuariosInitial = [
-  { id: 'USR-001', nombre: 'Carlos Mendoza', email: 'carlos@gmail.com', rol: 'cliente', contratos: 5, registro: '2025-11-12', estado: 'activo', iniciales: 'CM' },
-  { id: 'USR-002', nombre: 'Sofía Ramírez', email: 'sofia.r@hotmail.com', rol: 'cliente', contratos: 2, registro: '2025-12-01', estado: 'activo', iniciales: 'SR' },
-  { id: 'USR-003', nombre: 'Lic. Torres Admin', email: 'torres@artistasapp.mx', rol: 'admin', contratos: 0, registro: '2025-10-01', estado: 'activo', iniciales: 'TA' },
-  { id: 'USR-004', nombre: 'Bodas del Norte SA', email: 'contacto@bodasdelnorte.com', rol: 'empresa', contratos: 8, registro: '2025-09-15', estado: 'activo', iniciales: 'BN' },
-  { id: 'USR-005', nombre: 'Pedro Loza', email: 'pedro_loza@outlook.com', rol: 'cliente', contratos: 1, registro: '2026-01-08', estado: 'inactivo', iniciales: 'PL' },
-  { id: 'USR-006', nombre: 'Club Nocturno Éclat', email: 'eventos@eclat.mx', rol: 'empresa', contratos: 12, registro: '2025-08-20', estado: 'activo', iniciales: 'CE' },
+interface Usuario {
+  id: string
+  nombre: string
+  email: string
+  rol: 'cliente' | 'admin' | 'empresa'
+  contratos: number
+  registro: string
+  estado: 'activo' | 'inactivo'
+  iniciales: string
+  verificacion: 'verificado' | 'pendiente' | 'no_verificado' | 'rechazado'
+}
+
+const usuariosInitial: Usuario[] = [
+  { id: 'USR-001', nombre: 'Carlos Mendoza', email: 'carlos@gmail.com', rol: 'cliente', contratos: 5, registro: '2025-11-12', estado: 'activo', iniciales: 'CM', verificacion: 'verificado' },
+  { id: 'USR-002', nombre: 'Sofía Ramírez', email: 'sofia.r@hotmail.com', rol: 'cliente', contratos: 2, registro: '2025-12-01', estado: 'activo', iniciales: 'SR', verificacion: 'pendiente' },
+  { id: 'USR-003', nombre: 'Lic. Torres Admin', email: 'torres@artistasapp.mx', rol: 'admin', contratos: 0, registro: '2025-10-01', estado: 'activo', iniciales: 'TA', verificacion: 'verificado' },
+  { id: 'USR-004', nombre: 'Bodas del Norte SA', email: 'contacto@bodasdelnorte.com', rol: 'empresa', contratos: 8, registro: '2025-09-15', estado: 'activo', iniciales: 'BN', verificacion: 'no_verificado' },
+  { id: 'USR-005', nombre: 'Pedro Loza', email: 'pedro_loza@outlook.com', rol: 'cliente', contratos: 1, registro: '2026-01-08', estado: 'inactivo', iniciales: 'PL', verificacion: 'rechazado' },
+  { id: 'USR-006', nombre: 'Club Nocturno Éclat', email: 'eventos@eclat.mx', rol: 'empresa', contratos: 12, registro: '2025-08-20', estado: 'activo', iniciales: 'CE', verificacion: 'verificado' },
 ]
 
 const rolConfig: Record<string, { label: string; bg: string; text: string; icon: any }> = {
@@ -36,6 +51,7 @@ const rolesFiltro = ['Todos', 'cliente', 'empresa', 'admin']
 export default function UsuariosPage() {
   const [search, setSearch] = useState('')
   const [rolActivo, setRolActivo] = useState('Todos')
+  const [selectedUser, setSelectedUser] = useState<Usuario | null>(null)
 
   const filtered = usuariosInitial.filter((u) => {
     const matchSearch = u.nombre.toLowerCase().includes(search.toLowerCase()) || 
@@ -115,6 +131,7 @@ export default function UsuariosPage() {
                   <th className="px-6 py-4 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Rol</th>
                   <th className="px-6 py-4 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Registro</th>
                   <th className="px-6 py-4 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Contratos</th>
+                  <th className="px-6 py-4 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Verificación</th>
                   <th className="px-6 py-4 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Estado</th>
                   <th className="px-6 py-4 text-right text-xs uppercase text-[#6b7280] font-bold tracking-wider">Acciones</th>
                 </tr>
@@ -146,6 +163,9 @@ export default function UsuariosPage() {
                       <td className="px-6 py-4 text-sm text-[#4b5563]">{u.registro}</td>
                       <td className="px-6 py-4 text-sm font-semibold text-[#111827]">{u.contratos}</td>
                       <td className="px-6 py-4">
+                        <VerificationBadge status={u.verificacion} size="sm" />
+                      </td>
+                      <td className="px-6 py-4">
                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
                           u.estado === 'activo' ? 'bg-[#ecfdf5] text-[#059669]' : 'bg-gray-100 text-gray-500'
                         }`}>
@@ -160,6 +180,16 @@ export default function UsuariosPage() {
                           </button>
                           <button className="p-2 text-[#9ca3af] hover:text-red-500 hover:bg-white rounded-lg transition-all">
                             <Trash2 size={16} />
+                          </button>
+                          <button 
+                            onClick={() => setSelectedUser(u)}
+                            className={`p-2 transition-all rounded-lg ${
+                              u.verificacion === 'verificado' 
+                                ? 'text-emerald-600 hover:bg-emerald-50' 
+                                : 'text-[#9ca3af] hover:bg-white hover:text-[#7c3aed]'
+                            }`}
+                          >
+                            {u.verificacion === 'verificado' ? <Shield size={16} /> : <CheckCircle size={16} />}
                           </button>
                         </div>
                       </td>
@@ -176,6 +206,19 @@ export default function UsuariosPage() {
           )}
         </div>
       </div>
+
+      {/* Modal KYC */}
+      {selectedUser && (
+        <KYCModal
+          isOpen={!!selectedUser}
+          onClose={() => setSelectedUser(null)}
+          user={{
+            id: selectedUser.id,
+            nombre: selectedUser.nombre,
+            verificacion: selectedUser.verificacion
+          }}
+        />
+      )}
     </div>
   )
 }

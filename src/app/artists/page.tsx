@@ -2,14 +2,30 @@
 
 import { useState } from 'react'
 import Header from '@/components/Header'
-import { Plus, Search, Star, MapPin, Eye, Edit, UserPlus, MoreVertical } from 'lucide-react'
+import { Plus, Search, Star, MapPin, Eye, Edit, UserPlus, MoreVertical, CheckCircle, Shield } from 'lucide-react'
+import VerificationBadge from '@/components/VerificationBadge'
+import KYCModal from '@/components/KYCModal'
+import ArtistDetailModal from '@/components/ArtistDetailModal'
+import EditArtistModal from '@/components/EditArtistModal'
 
-const artistas = [
-  { id: 'ART-001', nombre: 'María Reyes', categoria: 'Mariachi', especialidad: 'Regional', seguidores: '1.2k', calificacion: 4.9, estado: 'activo', ubicacion: 'Monterrey' },
-  { id: 'ART-002', nombre: 'DJ Pulso', categoria: 'DJ', especialidad: 'Electrónica', seguidores: '2.5k', calificacion: 4.7, estado: 'en evento', ubicacion: 'Guadalajara' },
-  { id: 'ART-003', nombre: 'Trío Elegance', categoria: 'Música', especialidad: 'Boleros', seguidores: '950', calificacion: 4.8, estado: 'activo', ubicacion: 'CDMX' },
-  { id: 'ART-004', nombre: 'Stand-up Rojas', categoria: 'Comedia', especialidad: 'Sátira', seguidores: '3.1k', calificacion: 4.5, estado: 'inactivo', ubicacion: 'CDMX' },
-  { id: 'ART-005', nombre: 'Ballet Folclórico', categoria: 'Danza', especialidad: 'Tradicional', seguidores: '5.0k', calificacion: 5.0, estado: 'activo', ubicacion: 'Oaxaca' },
+// Datos de ejemplo para Artistas
+interface Artista {
+  id: string
+  nombre: string
+  categoria: string
+  especialidad: string
+  calificacion: number
+  estado: 'activo' | 'en evento' | 'inactivo'
+  ubicacion: string
+  verificacion: 'verificado' | 'pendiente' | 'no_verificado' | 'rechazado'
+}
+
+const artistas: Artista[] = [
+  { id: 'ART-001', nombre: 'María Reyes', categoria: 'Mariachi', especialidad: 'Regional', calificacion: 4.9, estado: 'activo', ubicacion: 'Monterrey', verificacion: 'verificado' },
+  { id: 'ART-002', nombre: 'DJ Pulso', categoria: 'DJ', especialidad: 'Electrónica', calificacion: 4.7, estado: 'en evento', ubicacion: 'Guadalajara', verificacion: 'pendiente' },
+  { id: 'ART-003', nombre: 'Trío Elegance', categoria: 'Música', especialidad: 'Boleros', calificacion: 4.8, estado: 'activo', ubicacion: 'CDMX', verificacion: 'verificado' },
+  { id: 'ART-004', nombre: 'Stand-up Rojas', categoria: 'Comedia', especialidad: 'Sátira', calificacion: 4.5, estado: 'inactivo', ubicacion: 'CDMX', verificacion: 'no_verificado' },
+  { id: 'ART-005', nombre: 'Ballet Folclórico', categoria: 'Danza', especialidad: 'Tradicional', calificacion: 5.0, estado: 'activo', ubicacion: 'Oaxaca', verificacion: 'rechazado' },
 ]
 
 const statusConfig: Record<string, { label: string; className: string }> = {
@@ -23,6 +39,9 @@ const categoriasFiltro = ['Todos', 'Mariachi', 'DJ', 'Música', 'Comedia', 'Danz
 export default function ArtistasPage() {
   const [search, setSearch] = useState('')
   const [catActiva, setCatActiva] = useState('Todos')
+  const [selectedArtist, setSelectedArtist] = useState<Artista | null>(null)
+  const [viewingArtist, setViewingArtist] = useState<Artista | null>(null)
+  const [editingArtist, setEditingArtist] = useState<Artista | null>(null)
 
   const filtered = artistas.filter((a) => {
     const matchSearch = a.nombre.toLowerCase().includes(search.toLowerCase()) ||
@@ -98,8 +117,8 @@ export default function ArtistasPage() {
                   <th className="px-6 py-3 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Artista</th>
                   <th className="px-6 py-3 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Categoría</th>
                   <th className="px-6 py-3 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Ubicación</th>
-                  <th className="px-6 py-3 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Seguidores</th>
                   <th className="px-6 py-3 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Rating</th>
+                  <th className="px-6 py-3 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Verificación</th>
                   <th className="px-6 py-3 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Estado</th>
                   <th className="px-6 py-3 text-left text-xs uppercase text-[#6b7280] font-bold tracking-wider">Acciones</th>
                 </tr>
@@ -125,11 +144,13 @@ export default function ArtistasPage() {
                             {a.ubicacion}
                         </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-[#4b5563] font-medium">{a.seguidores}</td>
                     <td className="px-6 py-4">
                         <div className="flex items-center gap-1 text-sm font-bold text-[#f59e0b]">
                             <Star size={14} fill="#f59e0b" /> {a.calificacion}
                         </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <VerificationBadge status={a.verificacion} size="sm" />
                     </td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${statusConfig[a.estado].className}`}>
@@ -138,11 +159,27 @@ export default function ArtistasPage() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex gap-1">
-                        <button className="p-1.5 rounded-md text-[#9ca3af] hover:bg-white hover:text-[#7c3aed] hover:shadow-sm transition-all">
+                        <button 
+                          onClick={() => setViewingArtist(a)}
+                          className="p-1.5 rounded-md text-[#9ca3af] hover:bg-white hover:text-[#7c3aed] hover:shadow-sm transition-all"
+                        >
                           <Eye size={16} />
                         </button>
-                        <button className="p-1.5 rounded-md text-[#9ca3af] hover:bg-white hover:text-[#7c3aed] hover:shadow-sm transition-all">
+                        <button 
+                          onClick={() => setEditingArtist(a)}
+                          className="p-1.5 rounded-md text-[#9ca3af] hover:bg-white hover:text-[#7c3aed] hover:shadow-sm transition-all"
+                        >
                           <Edit size={16} />
+                        </button>
+                        <button 
+                          onClick={() => setSelectedArtist(a)}
+                          className={`p-1.5 rounded-md transition-all ${
+                            a.verificacion === 'verificado' 
+                              ? 'text-emerald-600 hover:bg-emerald-50' 
+                              : 'text-[#9ca3af] hover:bg-white hover:text-[#7c3aed]'
+                          } hover:shadow-sm`}
+                        >
+                          {a.verificacion === 'verificado' ? <Shield size={16} /> : <CheckCircle size={16} />}
                         </button>
                       </div>
                     </td>
@@ -153,6 +190,39 @@ export default function ArtistasPage() {
           </div>
         </div>
       </div>
+
+      {/* Modales */}
+      {selectedArtist && (
+        <KYCModal
+          isOpen={!!selectedArtist}
+          onClose={() => setSelectedArtist(null)}
+          user={{
+            id: selectedArtist.id,
+            nombre: selectedArtist.nombre,
+            verificacion: selectedArtist.verificacion
+          }}
+        />
+      )}
+
+      {viewingArtist && (
+        <ArtistDetailModal
+          isOpen={!!viewingArtist}
+          onClose={() => setViewingArtist(null)}
+          artist={viewingArtist}
+        />
+      )}
+
+      {editingArtist && (
+        <EditArtistModal
+          isOpen={!!editingArtist}
+          onClose={() => setEditingArtist(null)}
+          artist={editingArtist}
+          onSave={(updatedArtist) => {
+            console.log('Guardando cambios:', updatedArtist)
+            // Aquí iría la lógica para guardar
+          }}
+        />
+      )}
     </div>
   )
 }

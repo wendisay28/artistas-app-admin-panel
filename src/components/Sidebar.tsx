@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, Mic2, FileText, Users, Settings, Music2,
   Building, CalendarCheck, MapPin, Megaphone, Shield, ChevronRight,
-  Scale, Plus
+  Scale, Plus, DollarSign, MessageCircle, Percent
 } from 'lucide-react'
 import { LogoStyles } from '@/theme/brand'
 
@@ -20,7 +20,7 @@ const navSections = [
       { href: '/contracts', label: 'Contratos', icon: FileText },
       { href: '/users', label: 'Usuarios', icon: Users },
       { href: '/companies', label: 'Empresas', icon: Building },
-      { href: '/companies/create', label: 'Crear Empresa', icon: Plus },
+      { href: '/payments', label: 'Pagos', icon: DollarSign },
     ],
   },
   {
@@ -35,7 +35,11 @@ const navSections = [
   },
   {
     label: 'Sistema',
-    items: [{ href: '/configuration', label: 'Configuración', icon: Settings }],
+    items: [
+      { href: '/settings/fees', label: 'Fees', icon: Percent },
+      { href: '/support/tickets', label: 'Soporte', icon: MessageCircle },
+      { href: '/configuration', label: 'Configuración', icon: Settings },
+    ],
   },
 ]
 

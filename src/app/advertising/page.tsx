@@ -2,8 +2,12 @@
 
 import { useState } from 'react'
 import Header from '@/components/Header'
-import { Megaphone, Edit, Eye, Upload, Calendar, Clock, Target, Zap, Image as ImageIcon, X, Check } from 'lucide-react'
+import { 
+  Megaphone, Edit, Eye, Upload, Calendar, Target, 
+  Zap, X, Check, ExternalLink, MousePointer2, Image as LucideImage 
+} from 'lucide-react'
 
+// --- Interfaces ---
 interface Banner {
   id: string
   posicion: 'principal' | 'secundario' | 'terciario'
@@ -18,67 +22,35 @@ interface Banner {
   impresiones: number
   ctr: number
   creado: string
-  actualizado: string
 }
 
+// --- Datos de Ejemplo ---
 const bannersData: Banner[] = [
   {
     id: 'B-001',
     posicion: 'principal',
     titulo: 'Festival de Mariachi 2026',
-    descripcion: 'Los mejores grupos de mariachi del norte en un solo evento',
-    imagen: '/api/placeholder/800/400',
+    descripcion: 'Los mejores grupos de mariachi del norte en un solo evento profesional.',
+    imagen: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&q=80&w=1000',
     enlace: '/eventos/festival-mariachi-2026',
     estado: 'activo',
     clicks: 1250,
     impresiones: 15420,
     ctr: 8.11,
-    creado: '2026-01-15',
-    actualizado: '2026-02-20'
+    creado: '2026-01-15'
   },
   {
     id: 'B-002',
     posicion: 'secundario',
     titulo: 'DJ Pulso - Noche Electrónica',
-    descripcion: 'La mejor música electrónica con el DJ más reconocido',
-    imagen: '/api/placeholder/600/300',
+    descripcion: 'Promoción especial para el lanzamiento del nuevo tour.',
+    imagen: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=1000',
     enlace: '/artists/dj-pulso',
     estado: 'activo',
     clicks: 890,
     impresiones: 12300,
     ctr: 7.24,
-    creado: '2026-01-20',
-    actualizado: '2026-02-18'
-  },
-  {
-    id: 'B-003',
-    posicion: 'terciario',
-    titulo: 'Trío Elegance',
-    descripcion: 'Música romántica para tus momentos especiales',
-    imagen: '/api/placeholder/400/200',
-    enlace: '/artists/trio-elegance',
-    estado: 'programado',
-    fechaInicio: '2026-03-01',
-    fechaFin: '2026-03-31',
-    clicks: 0,
-    impresiones: 0,
-    ctr: 0,
-    creado: '2026-02-10',
-    actualizado: '2026-02-10'
-  },
-  {
-    id: 'B-004',
-    posicion: 'secundario',
-    titulo: 'Stand-up Comedy Night',
-    descripcion: 'Ríe hasta no poder con los mejores comediantes',
-    imagen: '/api/placeholder/600/300',
-    enlace: '/eventos/stand-up-comedy',
-    estado: 'inactivo',
-    clicks: 450,
-    impresiones: 8900,
-    ctr: 5.06,
-    creado: '2026-01-25',
-    actualizado: '2026-02-15'
+    creado: '2026-01-20'
   }
 ]
 
@@ -86,370 +58,225 @@ export default function PublicidadPage() {
   const [banners, setBanners] = useState<Banner[]>(bannersData)
   const [showModal, setShowModal] = useState(false)
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null)
-  const [formData, setFormData] = useState({
-    posicion: 'secundario' as Banner['posicion'],
-    titulo: '',
-    descripcion: '',
-    imagen: '',
-    enlace: '',
-    estado: 'activo' as Banner['estado'],
-    fechaInicio: '',
-    fechaFin: ''
-  })
-
-  const filteredBanners = banners.filter(banner => {
-    if (editingBanner) return banner.id === editingBanner.id
-    return true
-  })
-
+  
   const stats = {
     total: banners.length,
     activos: banners.filter(b => b.estado === 'activo').length,
     totalClicks: banners.reduce((acc, b) => acc + b.clicks, 0),
-    totalImpresiones: banners.reduce((acc, b) => acc + b.impresiones, 0),
-    avgCTR: banners.length > 0 ? banners.reduce((acc, b) => acc + b.ctr, 0) / banners.length : 0
-  }
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (editingBanner) {
-      setBanners(prev => prev.map(b => 
-        b.id === editingBanner.id 
-          ? { ...b, ...formData, actualizado: new Date().toISOString().split('T')[0] }
-          : b
-      ))
-    } else {
-      const newBanner: Banner = {
-        id: `B-${String(banners.length + 1).padStart(3, '0')}`,
-        ...formData,
-        clicks: 0,
-        impresiones: 0,
-        ctr: 0,
-        creado: new Date().toISOString().split('T')[0],
-        actualizado: new Date().toISOString().split('T')[0]
-      }
-      setBanners(prev => [...prev, newBanner])
-    }
-    
-    setShowModal(false)
-    setEditingBanner(null)
-    setFormData({
-      posicion: 'secundario',
-      titulo: '',
-      descripcion: '',
-      imagen: '',
-      enlace: '',
-      estado: 'activo',
-      fechaInicio: '',
-      fechaFin: ''
-    })
-  }
-
-  const handleEdit = (banner: Banner) => {
-    setEditingBanner(banner)
-    setFormData({
-      posicion: banner.posicion,
-      titulo: banner.titulo,
-      descripcion: banner.descripcion,
-      imagen: banner.imagen,
-      enlace: banner.enlace,
-      estado: banner.estado,
-      fechaInicio: banner.fechaInicio || '',
-      fechaFin: banner.fechaFin || ''
-    })
-    setShowModal(true)
-  }
-
-  const getEstadoColor = (estado: Banner['estado']) => {
-    switch (estado) {
-      case 'activo': return 'bg-emerald-100 text-emerald-700'
-      case 'inactivo': return 'bg-red-100 text-red-700'
-      case 'programado': return 'bg-amber-100 text-amber-700'
-      default: return 'bg-gray-100 text-gray-700'
-    }
-  }
-
-  const getPosicionColor = (posicion: Banner['posicion']) => {
-    switch (posicion) {
-      case 'principal': return 'bg-purple-100 text-purple-700'
-      case 'secundario': return 'bg-blue-100 text-blue-700'
-      case 'terciario': return 'bg-green-100 text-green-700'
-      default: return 'bg-gray-100 text-gray-700'
-    }
+    avgCTR: banners.length > 0 ? (banners.reduce((acc, b) => acc + b.ctr, 0) / banners.length).toFixed(2) : 0
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f6ff] pb-12">
-      <Header title="Publicidad" subtitle="Gestiona banners y campañas promocionales" />
+    <div className="min-h-screen bg-[#f8f6ff] pb-16">
+      <Header title="Publicidad" subtitle="Campañas y Banners Promocionales" />
 
-      <main className="px-6 py-8 space-y-8">
-        {/* Dashboard de Estadísticas */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white p-6 rounded-2xl border border-[#7c3aed1a] shadow-sm">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-[#6b7280]">Total Banners</span>
-              <Megaphone className="text-[#7c3aed]" size={20} />
+      <div className="px-6 py-8 flex flex-col gap-5">
+        
+        {/* Estadísticas - Estilo Users con iconos */}
+        <div className="flex gap-4">
+          <div className="bg-white px-4 py-2 rounded-xl border border-[#7c3aed1a] shadow-sm flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-purple-50 text-purple-600">
+              <Megaphone size={16} />
             </div>
-            <p className="text-2xl font-bold text-[#1e1b4b]">{stats.total}</p>
+            <div>
+              <span className="text-xs text-[#6b7280] block">Total Banners</span>
+              <span className="text-lg font-bold text-[#1e1b4b]">{stats.total}</span>
+            </div>
           </div>
-          
-          <div className="bg-white p-6 rounded-2xl border border-[#7c3aed1a] shadow-sm">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-[#6b7280]">Activos</span>
-              <Zap className="text-[#10b981]" size={20} />
+          <div className="bg-white px-4 py-2 rounded-xl border border-[#7c3aed1a] shadow-sm flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600">
+              <Zap size={16} />
             </div>
-            <p className="text-2xl font-bold text-[#1e1b4b]">{stats.activos}</p>
+            <div>
+              <span className="text-xs text-[#6b7280] block">Activos</span>
+              <span className="text-lg font-bold text-[#059669]">{stats.activos}</span>
+            </div>
           </div>
-          
-          <div className="bg-white p-6 rounded-2xl border border-[#7c3aed1a] shadow-sm">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-[#6b7280]">Total Clicks</span>
-              <Target className="text-[#2563eb]" size={20} />
+          <div className="bg-white px-4 py-2 rounded-xl border border-[#7c3aed1a] shadow-sm flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-blue-50 text-blue-600">
+              <MousePointer2 size={16} />
             </div>
-            <p className="text-2xl font-bold text-[#1e1b4b]">{stats.totalClicks.toLocaleString()}</p>
+            <div>
+              <span className="text-xs text-[#6b7280] block">Clicks</span>
+              <span className="text-lg font-bold text-[#1e1b4b]">{stats.totalClicks.toLocaleString()}</span>
+            </div>
           </div>
-          
-          <div className="bg-white p-6 rounded-2xl border border-[#7c3aed1a] shadow-sm">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-[#6b7280]">CTR Promedio</span>
-              <Eye className="text-[#f59e0b]" size={20} />
+          <div className="bg-white px-4 py-2 rounded-xl border border-[#7c3aed1a] shadow-sm flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-amber-50 text-amber-600">
+              <Target size={16} />
             </div>
-            <p className="text-2xl font-bold text-[#1e1b4b]">{stats.avgCTR.toFixed(2)}%</p>
+            <div>
+              <span className="text-xs text-[#6b7280] block">CTR</span>
+              <span className="text-lg font-bold text-[#1e1b4b]">{stats.avgCTR}%</span>
+            </div>
           </div>
         </div>
 
-        {/* Botón de Crear */}
-        <div className="flex justify-end">
+        {/* Header de sección y Acción */}
+        <div className="flex justify-between items-center">
+          <h2 className="text-lg font-bold text-[#1e1b4b] flex items-center gap-2">
+            Inventario de Banners 
+            <span className="text-xs font-medium bg-white px-2 py-0.5 rounded-full border border-gray-200">{banners.length}</span>
+          </h2>
           <button 
             onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-br from-[#7c3aed] to-[#2563eb] text-white rounded-xl font-bold text-sm shadow-lg shadow-purple-200 hover:shadow-xl hover:-translate-y-0.5 transition-all"
+            className="px-6 py-2.5 bg-[#7c3aed] text-white rounded-xl font-bold text-sm shadow-lg shadow-[#7c3aed30] hover:bg-[#6d28d9] transition-all flex items-center gap-2"
           >
-            <Upload size={18} />
-            Crear Banner
+            <Upload size={16} /> Nuevo Banner
           </button>
         </div>
 
-        {/* Lista de Banners */}
-        <div className="space-y-6">
-          {filteredBanners.map((banner) => (
-            <div key={banner.id} className="bg-white rounded-2xl border border-[#7c3aed1a] overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-              <div className="p-6">
-                <div className="flex flex-col lg:flex-row gap-6">
-                  {/* Preview del Banner */}
-                  <div className="lg:w-1/3">
-                    <div className="relative aspect-video bg-gray-100 rounded-xl overflow-hidden">
-                      <img 
-                        src={banner.imagen} 
-                        alt={banner.titulo}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute top-3 left-3 flex gap-2">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getPosicionColor(banner.posicion)}`}>
-                          {banner.posicion}
-                        </span>
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getEstadoColor(banner.estado)}`}>
-                          {banner.estado}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Información del Banner */}
-                  <div className="lg:w-2/3 space-y-4">
-                    <div>
-                      <h3 className="text-xl font-bold text-[#1e1b4b] mb-2">{banner.titulo}</h3>
-                      <p className="text-[#6b7280] mb-4">{banner.descripcion}</p>
-                      <div className="flex flex-wrap gap-4 text-sm">
-                        <div>
-                          <span className="text-[#6b7280]">Clicks:</span>
-                          <span className="font-medium text-[#1e1b4b] ml-1">{banner.clicks.toLocaleString()}</span>
-                        </div>
-                        <div>
-                          <span className="text-[#6b7280]">Impresiones:</span>
-                          <span className="font-medium text-[#1e1b4b] ml-1">{banner.impresiones.toLocaleString()}</span>
-                        </div>
-                        <div>
-                          <span className="text-[#6b7280]">CTR:</span>
-                          <span className="font-medium text-[#10b981] ml-1">{banner.ctr.toFixed(2)}%</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {banner.estado === 'programado' && (
-                      <div className="flex items-center gap-2 text-sm text-[#f59e0b]">
-                        <Calendar size={16} />
-                        <span>Programado: {banner.fechaInicio} - {banner.fechaFin}</span>
-                      </div>
-                    )}
-
-                    <div className="flex items-center justify-between pt-4 border-t border-[#e5e7eb]">
-                      <div className="text-xs text-[#6b7280]">
-                        <span>Creado: {banner.creado}</span>
-                        <span className="mx-2">•</span>
-                        <span>Actualizado: {banner.actualizado}</span>
-                      </div>
-                      
-                      <div className="flex gap-2">
-                        <button 
-                          onClick={() => handleEdit(banner)}
-                          className="p-2 text-[#6b7280] hover:text-[#7c3aed] hover:bg-[#f8f6ff] rounded-lg transition-all"
-                        >
-                          <Edit size={18} />
-                        </button>
-                        <button className="p-2 text-[#6b7280] hover:text-[#2563eb] hover:bg-[#f0f9ff] rounded-lg transition-all">
-                          <Eye size={18} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+        {/* Lista de Banners - Más compacto */}
+        <div className="grid grid-cols-1 gap-4">
+          {banners.map((banner) => (
+            <div key={banner.id} className="group bg-white rounded-2xl border border-[#7c3aed10] hover:border-[#7c3aed40] p-4 transition-all flex flex-col md:flex-row items-center gap-6 shadow-sm hover:shadow-md">
+              
+              <div className="w-full md:w-48 h-28 rounded-xl overflow-hidden relative flex-shrink-0 bg-gray-100">
+                <img src={banner.imagen} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                   <Eye className="text-white" size={20} />
                 </div>
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-3 mb-1">
+                  <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider ${
+                    banner.posicion === 'principal' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'
+                  }`}>
+                    {banner.posicion}
+                  </span>
+                  <span className={`text-[9px] font-bold uppercase ${banner.estado === 'activo' ? 'text-emerald-500' : 'text-gray-400'}`}>
+                    • {banner.estado}
+                  </span>
+                </div>
+                <h3 className="text-base font-bold text-[#1e1b4b] truncate">{banner.titulo}</h3>
+                <p className="text-xs text-gray-500 line-clamp-1 mt-1">{banner.descripcion}</p>
+                <div className="flex items-center gap-3 mt-3">
+                   <a href={banner.enlace} target="_blank" className="text-[10px] font-bold text-[#7c3aed] flex items-center gap-1 hover:underline">
+                     <ExternalLink size={10}/> Ver Enlace
+                   </a>
+                </div>
+              </div>
+
+              {/* Solución al error de cssConflict: usamos hidden md:flex */}
+              <div className="hidden lg:flex gap-8 px-6 border-x border-gray-50">
+                <Metric mini label="Clicks" value={banner.clicks} />
+                <Metric mini label="Impresiones" value={banner.impresiones} />
+                <Metric mini label="CTR" value={`${banner.ctr}%`} highlight />
+              </div>
+
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => setEditingBanner(banner)}
+                  className="p-2.5 text-gray-400 hover:text-[#7c3aed] hover:bg-[#f0edff] rounded-xl transition-all"
+                >
+                  <Edit size={18} />
+                </button>
+                <button className="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
+                  <X size={18} />
+                </button>
               </div>
             </div>
           ))}
         </div>
-      </main>
+      </div>
 
-      {/* Modal de Creación/Edición */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-[0_25px_50px_-12px_rgba(124,58,237,0.25)]">
-            <div className="p-6 border-b border-[#f3f4f6] flex justify-between items-center">
-              <h3 className="text-xl font-bold text-[#1e1b4b]">
-                {editingBanner ? 'Editar Banner' : 'Crear Nuevo Banner'}
-              </h3>
+      {/* Modal */}
+      {(showModal || editingBanner) && (
+        <div className="fixed inset-0 bg-[#1e1b4b]/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-[2.5rem] max-w-xl w-full p-8 shadow-2xl animate-in zoom-in duration-300">
+            <div className="flex justify-between items-center mb-8">
+              <div>
+                <h3 className="text-xl font-bold text-[#1e1b4b]">
+                  {editingBanner ? 'Editar Banner' : 'Configurar Banner'}
+                </h3>
+                <p className="text-xs text-gray-400 font-medium">Completa los detalles de la campaña</p>
+              </div>
               <button 
-                onClick={() => {
-                  setShowModal(false)
-                  setEditingBanner(null)
-                }}
+                onClick={() => { setShowModal(false); setEditingBanner(null); }} 
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
               >
                 <X size={20} />
               </button>
             </div>
             
-            <form onSubmit={handleSubmit} className="p-6 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-[#374151] mb-2">Posición</label>
-                  <select 
-                    value={formData.posicion}
-                    onChange={(e) => setFormData({...formData, posicion: e.target.value as Banner['posicion']})}
-                    className="w-full px-3 py-2 border border-[#e5e7eb] rounded-lg focus:ring-2 focus:ring-[#7c3aed] focus:border-[#7c3aed]"
-                  >
-                    <option value="principal">Principal</option>
-                    <option value="secundario">Secundario</option>
-                    <option value="terciario">Terciario</option>
+            <form className="space-y-5">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase text-gray-400 ml-1">Ubicación</label>
+                  <select className="w-full bg-gray-50 border-none rounded-2xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-[#7c3aed] outline-none transition-all appearance-none">
+                    <option>Principal</option>
+                    <option>Secundario</option>
                   </select>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-[#374151] mb-2">Estado</label>
-                  <select 
-                    value={formData.estado}
-                    onChange={(e) => setFormData({...formData, estado: e.target.value as Banner['estado']})}
-                    className="w-full px-3 py-2 border border-[#e5e7eb] rounded-lg focus:ring-2 focus:ring-[#7c3aed] focus:border-[#7c3aed]"
-                  >
-                    <option value="activo">Activo</option>
-                    <option value="inactivo">Inactivo</option>
-                    <option value="programado">Programado</option>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black uppercase text-gray-400 ml-1">Estado</label>
+                  <select className="w-full bg-gray-50 border-none rounded-2xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-[#7c3aed] outline-none transition-all appearance-none">
+                    <option>Activo</option>
+                    <option>Programado</option>
                   </select>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-[#374151] mb-2">Título</label>
-                <input 
-                  type="text"
-                  value={formData.titulo}
-                  onChange={(e) => setFormData({...formData, titulo: e.target.value})}
-                  className="w-full px-3 py-2 border border-[#e5e7eb] rounded-lg focus:ring-2 focus:ring-[#7c3aed] focus:border-[#7c3aed]"
-                  required
-                />
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase text-gray-400 ml-1">Título de Campaña</label>
+                <input type="text" className="w-full bg-gray-50 border-none rounded-2xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-[#7c3aed] outline-none transition-all" defaultValue={editingBanner?.titulo} />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-[#374151] mb-2">Descripción</label>
-                <textarea 
-                  value={formData.descripcion}
-                  onChange={(e) => setFormData({...formData, descripcion: e.target.value})}
-                  className="w-full px-3 py-2 border border-[#e5e7eb] rounded-lg focus:ring-2 focus:ring-[#7c3aed] focus:border-[#7c3aed]"
-                  rows={3}
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[#374151] mb-2">URL de la Imagen</label>
-                <input 
-                  type="url"
-                  value={formData.imagen}
-                  onChange={(e) => setFormData({...formData, imagen: e.target.value})}
-                  className="w-full px-3 py-2 border border-[#e5e7eb] rounded-lg focus:ring-2 focus:ring-[#7c3aed] focus:border-[#7c3aed]"
-                  placeholder="https://ejemplo.com/imagen.jpg"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-[#374151] mb-2">Enlace</label>
-                <input 
-                  type="url"
-                  value={formData.enlace}
-                  onChange={(e) => setFormData({...formData, enlace: e.target.value})}
-                  className="w-full px-3 py-2 border border-[#e5e7eb] rounded-lg focus:ring-2 focus:ring-[#7c3aed] focus:border-[#7c3aed]"
-                  placeholder="https://ejemplo.com/destino"
-                  required
-                />
-              </div>
-
-              {formData.estado === 'programado' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-[#374151] mb-2">Fecha Inicio</label>
-                    <input 
-                      type="date"
-                      value={formData.fechaInicio}
-                      onChange={(e) => setFormData({...formData, fechaInicio: e.target.value})}
-                      className="w-full px-3 py-2 border border-[#e5e7eb] rounded-lg focus:ring-2 focus:ring-[#7c3aed] focus:border-[#7c3aed]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-[#374151] mb-2">Fecha Fin</label>
-                    <input 
-                      type="date"
-                      value={formData.fechaFin}
-                      onChange={(e) => setFormData({...formData, fechaFin: e.target.value})}
-                      className="w-full px-3 py-2 border border-[#e5e7eb] rounded-lg focus:ring-2 focus:ring-[#7c3aed] focus:border-[#7c3aed]"
-                    />
-                  </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase text-gray-400 ml-1">URL Imagen</label>
+                <div className="relative">
+                  {/* Corregido: Usando LucideImage en lugar de ImageIcon */}
+                  <LucideImage className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                  <input type="text" className="w-full bg-gray-50 border-none rounded-2xl pl-12 pr-4 py-3 text-sm font-bold focus:ring-2 focus:ring-[#7c3aed] outline-none transition-all" defaultValue={editingBanner?.imagen} />
                 </div>
-              )}
+              </div>
 
-              <div className="flex justify-end gap-4 pt-6 border-t border-[#e5e7eb]">
+              <div className="pt-4 flex gap-3">
                 <button 
-                  type="button"
-                  onClick={() => {
-                    setShowModal(false)
-                    setEditingBanner(null)
-                  }}
-                  className="px-6 py-2 border border-[#e5e7eb] text-[#6b7280] rounded-lg hover:bg-gray-50 transition-colors"
+                  type="button" 
+                  onClick={() => { setShowModal(false); setEditingBanner(null); }} 
+                  className="flex-1 py-4 text-gray-400 font-bold text-sm hover:bg-gray-50 rounded-2xl transition-all"
                 >
                   Cancelar
                 </button>
-                <button 
-                  type="submit"
-                  className="px-6 py-2 bg-gradient-to-br from-[#7c3aed] to-[#2563eb] text-white rounded-lg font-medium hover:shadow-lg transition-all flex items-center gap-2"
-                >
-                  <Check size={18} />
-                  {editingBanner ? 'Actualizar' : 'Crear'}
+                <button type="submit" className="flex-[2] py-4 bg-[#7c3aed] text-white font-bold text-sm rounded-2xl shadow-lg shadow-[#7c3aed30] hover:bg-[#6d28d9] transition-all flex items-center justify-center gap-2">
+                  <Check size={18} /> {editingBanner ? 'Guardar Cambios' : 'Crear Banner'}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
+    </div>
+  )
+}
+
+function StatCard({ icon, label, value, color }: any) {
+  const colors: any = {
+    purple: 'bg-purple-50 text-purple-600',
+    emerald: 'bg-emerald-50 text-emerald-600',
+    blue: 'bg-blue-50 text-blue-600',
+    amber: 'bg-amber-50 text-amber-600'
+  }
+  return (
+    <div className="bg-white p-5 rounded-2xl border border-[#7c3aed0a] flex items-center gap-4 shadow-sm">
+      <div className={`p-3 rounded-xl ${colors[color]}`}>{icon}</div>
+      <div>
+        <p className="text-xl font-bold text-[#1e1b4b] leading-none">{value}</p>
+        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1.5">{label}</p>
+      </div>
+    </div>
+  )
+}
+
+function Metric({ label, value, highlight, mini }: any) {
+  return (
+    <div className="text-center">
+      <p className="text-[9px] font-black text-gray-400 uppercase tracking-tighter mb-1">{label}</p>
+      <p className={`font-bold ${mini ? 'text-sm' : 'text-lg'} ${highlight ? 'text-[#10b981]' : 'text-[#1e1b4b]'}`}>
+        {value}
+      </p>
     </div>
   )
 }
