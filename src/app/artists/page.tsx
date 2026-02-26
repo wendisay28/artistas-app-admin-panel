@@ -199,7 +199,10 @@ export default function ArtistasPage() {
           user={{
             id: selectedArtist.id,
             nombre: selectedArtist.nombre,
-            verificacion: selectedArtist.verificacion
+            tipo: 'artista',
+            verificacion: selectedArtist.verificacion,
+            categoria: selectedArtist.categoria,
+            ubicacion: selectedArtist.ubicacion
           }}
         />
       )}
@@ -217,7 +220,7 @@ export default function ArtistasPage() {
           isOpen={!!editingArtist}
           onClose={() => setEditingArtist(null)}
           artist={editingArtist}
-          onSave={(updatedArtist) => {
+          onSave={(updatedArtist: any) => {
             console.log('Guardando cambios:', updatedArtist)
             // Aquí iría la lógica para guardar
           }}

@@ -4,8 +4,9 @@ import { useState, useEffect, useCallback } from 'react'
 import {
   X, Shield, CheckCircle2, XCircle, ExternalLink,
   Download, User, Calendar, Hash, FileCheck,
-  Landmark, ZoomIn, RotateCcw,
+  Landmark, ZoomIn, RotateCcw, MapPin, Briefcase,
 } from 'lucide-react'
+import { KYCUser, EntityType } from '@/types/entities'
 
 // ─── COMPONENTE SKELETON (Visual de carga) ───────────────────────────────────
 function KYCSkeleton() {
@@ -64,14 +65,6 @@ function KYCSkeleton() {
 }
 
 // ─── TIPOS ───────────────────────────────────────────────────────────────────
-interface KYCUser {
-  id: string
-  nombre: string
-  verificacion: 'pendiente' | 'verificado' | 'rechazado' | 'no_verificado'
-  aprobadoPor?: string
-  fechaAprobacion?: string
-  motivoRechazo?: string
-}
 
 interface KYCModalProps {
   isOpen: boolean
@@ -89,14 +82,21 @@ const REJECTION_REASONS = [
   'Info incorrecta',
 ]
 
-const CHECKLIST_ITEMS = [
+const ARTIST_CHECKLIST = [
   'Cédula frontal legible',
   'Cédula reverso legible',
   'Selfie coincide con documento',
   'RUT vigente y válido',
 ]
 
-const DOCUMENTS = [
+const COMPANY_CHECKLIST = [
+  'NIT válido y vigente',
+  'Cámara de comercio actualizada',
+  'RUT empresa diligenciado',
+  'Documento representante legible',
+]
+
+const ARTIST_DOCUMENTS = [
   {
     id: 'front',
     label: 'Cédula Frontal',
@@ -123,8 +123,57 @@ const DOCUMENTS = [
     label: 'RUT',
     sublabel: 'Documento legal',
     type: 'pdf',
-    src: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+    src: 'https://r.jina.ai/http://www.africau.edu/images/default/sample.pdf',
     filename: 'RUT_Septiembre_2025.pdf',
+  },
+  {
+    id: 'certificado_bancario',
+    label: 'Certificado Bancario',
+    sublabel: 'Documento de cuenta bancaria',
+    type: 'pdf',
+    src: 'https://r.jina.ai/http://www.africau.edu/images/default/sample.pdf',
+    filename: 'Certificado_Bancario.pdf',
+  },
+]
+
+const COMPANY_DOCUMENTS = [
+  {
+    id: 'acuerdo',
+    label: 'Acuerdo',
+    sublabel: 'Documento de acuerdo comercial',
+    type: 'pdf',
+    src: 'https://r.jina.ai/http://www.africau.edu/images/default/sample.pdf',
+    filename: 'Acuerdo_Comercial.pdf',
+  },
+  {
+    id: 'camara',
+    label: 'Cámara de Comercio',
+    sublabel: 'Certificado de existencia (PDF)',
+    type: 'pdf',
+    src: 'https://r.jina.ai/http://www.africau.edu/images/default/sample.pdf',
+    filename: 'Camara_Comercio.pdf',
+  },
+  {
+    id: 'rut_empresa',
+    label: 'RUT Empresa',
+    sublabel: 'Registro Único Tributario (PDF)',
+    type: 'pdf',
+    src: 'https://r.jina.ai/http://www.africau.edu/images/default/sample.pdf',
+    filename: 'RUT_Empresa.pdf',
+  },
+  {
+    id: 'representante_frontal',
+    label: 'Cédula Frontal Representante',
+    sublabel: 'Lado A del documento del representante legal',
+    type: 'image',
+    src: 'https://images.unsplash.com/photo-1621243804936-775306a8f2e3?q=80&w=800',
+  },
+  {
+    id: 'representante_reverso',
+    label: 'Cédula Reverso Representante',
+    sublabel: 'Lado B del documento del representante legal',
+    type: 'image',
+    src: 'https://images.unsplash.com/photo-1589156226687-a48ba9795ee3?q=80&w=800',
   },
 ]
 
@@ -174,18 +223,29 @@ export default function KYCModal({ isOpen, onClose, user }: KYCModalProps) {
     }
   }, [isOpen, user.id])
 
+  // Variables calculadas (siempre después de todos los hooks)
+  const isPending = user.verificacion === 'pendiente' || user.verificacion === 'no_verificado'
+  const isVerified = user.verificacion === 'verificado'
+  const isRejectedState = user.verificacion === 'rechazado'
+  const isArtist = user.tipo === 'artista'
+  const isCompany = user.tipo === 'empresa'
+  
+  const documents = isArtist ? ARTIST_DOCUMENTS : COMPANY_DOCUMENTS
+  const checklistItems = isArtist ? ARTIST_CHECKLIST : COMPANY_CHECKLIST
+
   // Atajos de teclado para navegación
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (!isOpen) return // Early return si no está abierto
     if (e.key === 'ArrowRight') {
-      setActiveDoc((prev) => (prev + 1) % DOCUMENTS.length)
+      setActiveDoc((prev) => (prev + 1) % documents.length)
       setZoomed(false)
     }
     if (e.key === 'ArrowLeft') {
-      setActiveDoc((prev) => (prev - 1 + DOCUMENTS.length) % DOCUMENTS.length)
+      setActiveDoc((prev) => (prev - 1 + documents.length) % documents.length)
       setZoomed(false)
     }
     if (e.key === 'Escape' && !isRejecting) onClose()
-  }, [isRejecting, onClose])
+  }, [isOpen, isRejecting, onClose, documents.length])
 
   useEffect(() => {
     if (isOpen) window.addEventListener('keydown', handleKeyDown)
@@ -193,13 +253,10 @@ export default function KYCModal({ isOpen, onClose, user }: KYCModalProps) {
   }, [isOpen, handleKeyDown])
 
   if (!isOpen) return null
-
-  const isPending = user.verificacion === 'pendiente' || user.verificacion === 'no_verificado'
-  const isVerified = user.verificacion === 'verificado'
-  const isRejectedState = user.verificacion === 'rechazado'
-  const currentDoc = DOCUMENTS[activeDoc]
+  
+  const currentDoc = documents[activeDoc]
   const status = statusConfig[user.verificacion]
-  const allChecked = checkedItems.length === CHECKLIST_ITEMS.length
+  const allChecked = checkedItems.length === checklistItems.length
 
   const toggleChip = (chip: string) => {
     setSelectedChips(prev =>
@@ -239,7 +296,7 @@ export default function KYCModal({ isOpen, onClose, user }: KYCModalProps) {
                 </span>
               </div>
               <p className="text-[10px] text-[#9ca3af] font-medium tracking-widest uppercase mt-0.5">
-                Verificación KYC · {user.id}
+                Verificación KYC · {isArtist ? 'Artista' : 'Empresa'} · {user.id}
               </p>
             </div>
           </div>
@@ -284,11 +341,11 @@ export default function KYCModal({ isOpen, onClose, user }: KYCModalProps) {
                   </>
                 ) : (
                   <div className="relative w-full h-full flex items-center justify-center bg-[#f8f6ff] rounded-xl overflow-hidden">
-                    {/* iframe para previsualización del PDF */}
+                    {/* iframe para previsualización del PDF usando Google Docs Viewer */}
                     <iframe
-                      src={currentDoc.src!}
+                      src={`https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(currentDoc.src!)}`}
                       className="w-full h-full border-0 rounded-lg"
-                      title="Previsualización del RUT"
+                      title="Previsualización del documento PDF"
                       style={{
                         transform: zoomed ? 'scale(1.2)' : 'scale(1)',
                         transition: 'transform 0.3s cubic-bezier(0.4,0,0.2,1)',
@@ -322,7 +379,7 @@ export default function KYCModal({ isOpen, onClose, user }: KYCModalProps) {
 
               {/* Thumbnails con navegación */}
               <div className="flex gap-2 px-4 pb-4">
-                {DOCUMENTS.map((doc, i) => (
+                {documents.map((doc, i) => (
                   <button
                     key={doc.id}
                     onClick={() => { setActiveDoc(i); setZoomed(false) }}
@@ -356,20 +413,29 @@ export default function KYCModal({ isOpen, onClose, user }: KYCModalProps) {
               <div className="flex-1 overflow-y-auto p-5 space-y-6">
               
                 <div>
-                  <SectionLabel label="Datos del artista" />
+                  <SectionLabel label={`Datos del ${isArtist ? 'artista' : 'empresa'}`} />
                   <div className="mt-3 bg-[#f9fafb] rounded-xl border border-[#f3f4f6] divide-y divide-[#f3f4f6]">
-                    <MetaRow icon={<User size={12} />} label="Nombre" value={user.nombre} />
+                    <MetaRow icon={<User size={12} />} label={isArtist ? 'Nombre' : 'Razón Social'} value={user.nombre} />
                     <MetaRow icon={<Hash size={12} />} label="ID" value={user.id} />
-                    <MetaRow icon={<Hash size={12} />} label="Nº Documento" value="1020304050" />
+                    {isCompany && user.categoria && (
+                      <MetaRow icon={<Briefcase size={12} />} label="Categoría" value={user.categoria} />
+                    )}
+                    {isCompany && user.ubicacion && (
+                      <MetaRow icon={<MapPin size={12} />} label="Ubicación" value={user.ubicacion} />
+                    )}
+                    {isCompany && user.eventos && (
+                      <MetaRow icon={<Calendar size={12} />} label="Eventos" value={user.eventos} />
+                    )}
+                    <MetaRow icon={<Hash size={12} />} label={isArtist ? 'Nº Documento' : 'Nº Identificación'} value={isArtist ? '1020304050' : '900.123.456-7'} />
                     <MetaRow icon={<Calendar size={12} />} label="Enviado el" value="24 Feb 2026" />
                   </div>
                 </div>
 
                 {isPending && (
                   <div>
-                    <SectionLabel label="Lista de revisión técnica" />
+                    <SectionLabel label={isArtist ? 'Lista de revisión técnica' : 'Lista de verificación empresarial'} />
                     <div className="mt-3 space-y-2">
-                      {CHECKLIST_ITEMS.map(item => (
+                      {checklistItems.map(item => (
                         <label 
                           key={item} 
                           className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-all cursor-pointer ${checkedItems.includes(item) ? 'bg-emerald-50 border-emerald-100' : 'bg-[#f9fafb] border-[#f3f4f6] hover:bg-white'}`}
@@ -392,7 +458,7 @@ export default function KYCModal({ isOpen, onClose, user }: KYCModalProps) {
                     <div className="flex items-center gap-2 mb-2">
                       {isVerified ? <CheckCircle2 size={15} className="text-[#059669]" /> : <XCircle size={15} className="text-red-500" />}
                       <span className={`text-xs font-bold uppercase tracking-wider ${isVerified ? 'text-[#059669]' : 'text-red-600'}`}>
-                        {isVerified ? 'Artista verificado' : 'Solicitud rechazada'}
+                        {isVerified ? (isArtist ? 'Artista verificado' : 'Empresa verificada') : 'Solicitud rechazada'}
                       </span>
                     </div>
                     <p className="text-[11px] opacity-80 leading-relaxed">
@@ -410,7 +476,7 @@ export default function KYCModal({ isOpen, onClose, user }: KYCModalProps) {
                       disabled={!allChecked}
                       className={`w-full py-3 rounded-xl text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-sm ${allChecked ? 'bg-[#059669] text-white hover:bg-[#047857]' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
                     >
-                      <FileCheck size={14} /> {allChecked ? 'Aprobar artista' : 'Complete la lista'}
+                      <FileCheck size={14} /> {allChecked ? (isArtist ? 'Aprobar artista' : 'Aprobar empresa') : 'Complete la lista'}
                     </button>
                     <button onClick={() => setIsRejecting(true)} className="w-full py-2 rounded-xl text-xs font-bold uppercase text-red-400 hover:bg-red-50 transition-all">
                       Rechazar solicitud

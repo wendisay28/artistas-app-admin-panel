@@ -3,8 +3,9 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import {
   X, Save, User, Mail, Tag, Briefcase, Instagram, 
-  Music, Globe, DollarSign, Camera, AlertCircle, Phone, Star
+  Music, Globe, DollarSign, Camera, AlertCircle, Phone, Star, Building
 } from 'lucide-react'
+import { Entity, EntityType, EditEntityModalProps, getCategorias, getEspecialidades, ESTADO_CONFIG } from '@/types/entities'
 
 // ─── COMPONENTE SKELETON (Optimizado) ───────────────────────────────────────
 function EditArtistSkeleton() {
@@ -33,28 +34,19 @@ function EditArtistSkeleton() {
 }
 
 // ─── DATA DE CONFIGURACIÓN ──────────────────────────────────────────────────
-const CATEGORIAS = ['Mariachi', 'DJ', 'Música', 'Comedia', 'Danza', 'Banda', 'Magia', 'Fotógrafo']
-const ESPECIALIDADES: Record<string, string[]> = {
-  Mariachi: ['Regional', 'Tradicional', 'Moderno', 'Ranchero'],
-  DJ: ['Electrónica', 'House', 'Techno', 'Hip-Hop', 'Reggaetón'],
-  Música: ['Boleros', 'Rock', 'Pop', 'Jazz', 'Clásica'],
-  Comedia: ['Sátira', 'Stand-up', 'Imitación', 'Humor negro'],
-  Danza: ['Folclórica', 'Contemporánea', 'Ballet', 'Hip-Hop', 'Salsa'],
-  Banda: ['Sinaloense', 'Duranguense', 'Norteña', 'Tropical'],
-  Magia: ['Ilusionismo', 'Close-up', 'Mentalismo', 'Escapismo'],
-  Fotógrafo: ['Eventos', 'Retratos', 'Paisajes', 'Documental'],
-}
-
-const ESTADO_CONFIG = {
-  activo: { label: 'Activo', color: 'bg-[#ecfdf5] text-[#059669] border-emerald-200' },
-  'en evento': { label: 'En Evento', color: 'bg-[#eef2ff] text-[#4f46e5] border-indigo-200' },
-  inactivo: { label: 'Inactivo', color: 'bg-red-50 text-red-600 border-red-200' },
-}
+// Using imported types and constants from @/types/entities
 
 const inputBase = 'w-full px-3.5 py-2.5 bg-white border border-[#e5e7eb] rounded-xl text-sm font-semibold text-[#111827] outline-none transition-all placeholder:text-[#d1d5db] focus:border-[#7c3aed] focus:ring-2 focus:ring-[#7c3aed15]'
 
 // ─── COMPONENTE PRINCIPAL ─────────────────────────────────────────────────────
 export default function EditArtistModal({ isOpen, onClose, artist, onSave }: any) {
+  // Si no se proporciona tipo, asumimos que es artista (compatibilidad hacia atrás)
+  const tipo = artist?.tipo || 'artista'
+  const isArtist = tipo === 'artista'
+  const isCompany = tipo === 'empresa'
+  
+  const categorias = getCategorias(tipo)
+  const especialidades = getEspecialidades(tipo, artist?.categoria || '')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [hasChanged, setHasChanged] = useState(false)
@@ -63,10 +55,15 @@ export default function EditArtistModal({ isOpen, onClose, artist, onSave }: any
   const [formData, setFormData] = useState({
     ...artist,
     email: artist?.id ? `${artist.nombre.toLowerCase().replace(/\s+/g, '.')}@buscart.com` : '',
-    descripcion: artist?.descripcion || `Artista de ${artist?.categoria}.`,
+    descripcion: artist?.descripcion || `${isArtist ? 'Artista' : 'Empresa'} de ${artist?.categoria || 'varios'}.`,
     instagram: '', spotify: '', sitioWeb: '',
     tarifaMin: '0', tarifaMax: '0',
     avatarUrl: null as string | null,
+    // Campos específicos de empresa
+    telefono: artist?.telefono || '',
+    direccion: artist?.direccion || '',
+    representante: artist?.representante || '',
+    eventos: artist?.eventos || '0',
   })
 
   // Control de carga ultra rápido (300ms - punto dulce de velocidad percibida)
@@ -126,7 +123,7 @@ export default function EditArtistModal({ isOpen, onClose, artist, onSave }: any
               <User size={20} className="text-white" />
             </div>
             <div>
-              <h2 className="text-base font-black text-[#111827]">Editar Perfil Artístico</h2>
+              <h2 className="text-base font-black text-[#111827]">Editar Perfil {isArtist ? 'Artístico' : 'Empresarial'}</h2>
               <p className="text-[10px] text-[#9ca3af] font-bold tracking-widest uppercase mt-0.5">Gestión Administrativa</p>
             </div>
           </div>
@@ -160,7 +157,7 @@ export default function EditArtistModal({ isOpen, onClose, artist, onSave }: any
 
                 <div className="flex-1 space-y-4">
                   <div>
-                    <Label>Nombre del Artista</Label>
+                    <Label>{isArtist ? 'Nombre del Artista' : 'Nombre de la Empresa'}</Label>
                     <input 
                       type="text" 
                       value={formData.nombre} 
@@ -181,6 +178,18 @@ export default function EditArtistModal({ isOpen, onClose, artist, onSave }: any
                       </button>
                     ))}
                   </div>
+                  
+                  {isCompany && (
+                    <div className="mt-4">
+                      <Label icon={<Phone size={12}/>}>Teléfono de Contacto</Label>
+                      <input 
+                        type="tel" 
+                        value={formData.telefono} 
+                        onChange={e => handleChange('telefono', e.target.value)} 
+                        className={inputBase}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -192,12 +201,12 @@ export default function EditArtistModal({ isOpen, onClose, artist, onSave }: any
                     value={formData.categoria} 
                     onChange={e => {
                       const cat = e.target.value;
-                      setFormData((p:any) => ({...p, categoria: cat, especialidad: ESPECIALIDADES[cat][0]}));
+                      setFormData((p:any) => ({...p, categoria: cat, especialidad: getEspecialidades(tipo, cat)?.[0] || ''}));
                       setHasChanged(true);
                     }} 
                     className={inputBase}
                   >
-                    {CATEGORIAS.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                    {categorias.map(cat => <option key={cat} value={cat}>{cat}</option>)}
                   </select>
                 </div>
                 <div className="space-y-1.5">
@@ -209,16 +218,31 @@ export default function EditArtistModal({ isOpen, onClose, artist, onSave }: any
               {/* SECCIÓN 3: TARIFAS Y REDES */}
               <div className="grid grid-cols-2 gap-x-10">
                 <div className="space-y-4">
-                  <SectionLabel label="Tarifas Base (MXN)" />
+                  <SectionLabel label={isArtist ? 'Tarifas Base (MXN)' : 'Capacidad y Tarifas'} />
                   <div className="flex gap-3">
-                    <div className="relative flex-1">
-                      <DollarSign size={14} className="absolute left-3 top-3 text-gray-400" />
-                      <input type="number" value={formData.tarifaMin} onChange={e => handleChange('tarifaMin', e.target.value)} className={`${inputBase} pl-8`} />
-                    </div>
-                    <div className="relative flex-1">
-                      <DollarSign size={14} className="absolute left-3 top-3 text-gray-400" />
-                      <input type="number" value={formData.tarifaMax} onChange={e => handleChange('tarifaMax', e.target.value)} className={`${inputBase} pl-8`} />
-                    </div>
+                    {isArtist ? (
+                      <>
+                        <div className="relative flex-1">
+                          <DollarSign size={14} className="absolute left-3 top-3 text-gray-400" />
+                          <input type="number" value={formData.tarifaMin} onChange={e => handleChange('tarifaMin', e.target.value)} className={`${inputBase} pl-8`} placeholder="Mín" />
+                        </div>
+                        <div className="relative flex-1">
+                          <DollarSign size={14} className="absolute left-3 top-3 text-gray-400" />
+                          <input type="number" value={formData.tarifaMax} onChange={e => handleChange('tarifaMax', e.target.value)} className={`${inputBase} pl-8`} placeholder="Máx" />
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="relative flex-1">
+                          <Star size={14} className="absolute left-3 top-3 text-gray-400" />
+                          <input type="number" value={formData.eventos} onChange={e => handleChange('eventos', e.target.value)} className={`${inputBase} pl-8`} placeholder="Eventos/año" />
+                        </div>
+                        <div className="relative flex-1">
+                          <DollarSign size={14} className="absolute left-3 top-3 text-gray-400" />
+                          <input type="number" value={formData.tarifaMin} onChange={e => handleChange('tarifaMin', e.target.value)} className={`${inputBase} pl-8`} placeholder="Tarifa promedio" />
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
                 <div className="space-y-4">
@@ -233,14 +257,43 @@ export default function EditArtistModal({ isOpen, onClose, artist, onSave }: any
 
               {/* BIO */}
               <div className="space-y-3">
-                <SectionLabel label="Trayectoria y Biografía" />
+                <SectionLabel label={isArtist ? 'Trayectoria y Biografía' : 'Descripción y Servicios'} />
                 <textarea 
                   rows={3} 
                   value={formData.descripcion} 
                   onChange={e => handleChange('descripcion', e.target.value)}
+                  placeholder={isArtist ? 'Describe tu experiencia, estilo y trayectoria artística...' : 'Describe los servicios, instalaciones y capacidad de tu empresa...'}
                   className={`${inputBase} resize-none py-4`}
                 />
               </div>
+              
+              {isCompany && (
+                <div className="space-y-3">
+                  <SectionLabel label="Información Adicional" />
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <Label icon={<Building size={12}/>}>Dirección</Label>
+                      <input 
+                        type="text" 
+                        value={formData.direccion} 
+                        onChange={e => handleChange('direccion', e.target.value)} 
+                        placeholder="Dirección física de la empresa"
+                        className={inputBase}
+                      />
+                    </div>
+                    <div>
+                      <Label icon={<User size={12}/>}>Representante Legal</Label>
+                      <input 
+                        type="text" 
+                        value={formData.representante} 
+                        onChange={e => handleChange('representante', e.target.value)} 
+                        placeholder="Nombre del representante legal"
+                        className={inputBase}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

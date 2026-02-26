@@ -3,8 +3,10 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
-import { Plus, Search, MapPin, Eye, Edit, Building, MoreVertical, Briefcase, CheckCircle } from 'lucide-react'
+import { Plus, Search, MapPin, Eye, Edit, Building, MoreVertical, Briefcase, CheckCircle, Shield } from 'lucide-react'
 import VerificationBadge from '@/components/VerificationBadge'
+import KYCModal from '@/components/KYCModal'
+import EditArtistModal from '@/components/EditArtistModal'
 
 // Datos de ejemplo para Empresas (siguiendo tu estructura de Artistas)
 interface Empresa {
@@ -16,13 +18,23 @@ interface Empresa {
   estado: 'activo' | 'inactivo'
   ubicacion: string
   verificacion: 'verificado' | 'pendiente' | 'no_verificado' | 'rechazado'
+  tipo: 'empresa'
+  email?: string
+  telefono?: string
+  direccion?: string
+  representante?: string
+  descripcion?: string
+  instagram?: string
+  sitioWeb?: string
+  tarifaMin?: string
+  tarifaMax?: string
 }
 
 const empresas: Empresa[] = [
-  { id: 'EMP-001', nombre: 'Galería Central', categoria: 'Galería de Arte', especialidad: 'Exposiciones', eventos: '12', estado: 'activo', ubicacion: 'Bogotá', verificacion: 'verificado' },
-  { id: 'EMP-002', nombre: 'Teatro Colón', categoria: 'Centro Cultural', especialidad: 'Artes Escénicas', eventos: '45', estado: 'activo', ubicacion: 'Bogotá', verificacion: 'pendiente' },
-  { id: 'EMP-003', nombre: 'Agencia Vision', categoria: 'Agencia', especialidad: 'Representación', eventos: '8', estado: 'inactivo', ubicacion: 'Medellín', verificacion: 'no_verificado' },
-  { id: 'EMP-004', nombre: 'Museo Moderno', categoria: 'Galería de Arte', especialidad: 'Contemporáneo', eventos: '30', estado: 'activo', ubicacion: 'Cali', verificacion: 'verificado' },
+  { id: 'EMP-001', nombre: 'Galería Central', categoria: 'Galería de Arte', especialidad: 'Exposiciones', eventos: '12', estado: 'activo', ubicacion: 'Bogotá', verificacion: 'verificado', tipo: 'empresa' },
+  { id: 'EMP-002', nombre: 'Teatro Colón', categoria: 'Centro Cultural', especialidad: 'Artes Escénicas', eventos: '45', estado: 'activo', ubicacion: 'Bogotá', verificacion: 'verificado', tipo: 'empresa' },
+  { id: 'EMP-003', nombre: 'Agencia Vision', categoria: 'Agencia', especialidad: 'Representación', eventos: '8', estado: 'activo', ubicacion: 'Medellín', verificacion: 'verificado', tipo: 'empresa' },
+  { id: 'EMP-004', nombre: 'Museo Moderno', categoria: 'Galería de Arte', especialidad: 'Contemporáneo', eventos: '30', estado: 'activo', ubicacion: 'Cali', verificacion: 'verificado', tipo: 'empresa' },
 ]
 
 const statusConfig: Record<string, { label: string; className: string }> = {
@@ -36,6 +48,11 @@ export default function EmpresasPage() {
   const router = useRouter()
   const [search, setSearch] = useState('')
   const [catActiva, setCatActiva] = useState('Todos')
+  
+  // Estado para modales
+  const [selectedEmpresa, setSelectedEmpresa] = useState<Empresa | null>(null)
+  const [viewingEmpresa, setViewingEmpresa] = useState<Empresa | null>(null)
+  const [editingEmpresa, setEditingEmpresa] = useState<Empresa | null>(null)
 
   const filtered = empresas.filter((e) => {
     const matchSearch = e.nombre.toLowerCase().includes(search.toLowerCase()) ||
@@ -43,6 +60,26 @@ export default function EmpresasPage() {
     const matchCat = catActiva === 'Todos' || e.categoria === catActiva
     return matchSearch && matchCat
   })
+
+  // Manejadores de acciones (igual que en artists)
+  const handleViewDetails = (empresa: Empresa) => {
+    setViewingEmpresa(empresa)
+    // Aquí podrías abrir un modal con galería de imágenes del sitio
+    console.log('Viendo detalles de:', empresa.nombre)
+  }
+
+  const handleEdit = (empresa: Empresa) => {
+    setEditingEmpresa(empresa)
+  }
+
+  const handleVerification = (empresa: Empresa) => {
+    setSelectedEmpresa(empresa)
+  }
+
+  const handleSaveEdit = (data: any) => {
+    console.log('Guardando cambios:', data)
+    setEditingEmpresa(null)
+  }
 
   return (
     <div className="min-h-screen bg-[#f8f6ff] pb-12">
@@ -152,17 +189,31 @@ export default function EmpresasPage() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex gap-1">
-                        <button className="p-1.5 rounded-md text-[#9ca3af] hover:bg-white hover:text-[#7c3aed] hover:shadow-sm transition-all">
+                        <button 
+                          onClick={() => handleViewDetails(e)}
+                          className="p-1.5 rounded-md text-[#9ca3af] hover:bg-white hover:text-[#7c3aed] hover:shadow-sm transition-all"
+                          title="Ver detalles y galería"
+                        >
                           <Eye size={16} />
                         </button>
-                        <button className="p-1.5 rounded-md text-[#9ca3af] hover:bg-white hover:text-[#7c3aed] hover:shadow-sm transition-all">
+                        <button 
+                          onClick={() => handleEdit(e)}
+                          className="p-1.5 rounded-md text-[#9ca3af] hover:bg-white hover:text-[#7c3aed] hover:shadow-sm transition-all"
+                          title="Editar información"
+                        >
                           <Edit size={16} />
                         </button>
-                        {e.verificacion !== 'verificado' && (
-                          <button className="p-1.5 rounded-md text-[#9ca3af] hover:bg-white hover:text-emerald-600 hover:shadow-sm transition-all">
-                            <CheckCircle size={16} />
-                          </button>
-                        )}
+                        <button 
+                          onClick={() => handleVerification(e)}
+                          className={`p-1.5 rounded-md transition-all ${
+                            e.verificacion === 'verificado' 
+                              ? 'text-emerald-600 hover:bg-emerald-50' 
+                              : 'text-[#9ca3af] hover:bg-white hover:text-[#7c3aed]'
+                          } hover:shadow-sm`}
+                          title={e.verificacion === 'verificado' ? 'Verificación completa' : 'Verificar empresa'}
+                        >
+                          {e.verificacion === 'verificado' ? <Shield size={16} /> : <CheckCircle size={16} />}
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -172,6 +223,32 @@ export default function EmpresasPage() {
           </div>
         </div>
       </div>
+
+      {/* Modales - igual que en artists page */}
+      {selectedEmpresa && (
+        <KYCModal
+          isOpen={!!selectedEmpresa}
+          onClose={() => setSelectedEmpresa(null)}
+          user={{
+            id: selectedEmpresa.id,
+            nombre: selectedEmpresa.nombre,
+            tipo: 'empresa',
+            verificacion: selectedEmpresa.verificacion,
+            categoria: selectedEmpresa.categoria,
+            ubicacion: selectedEmpresa.ubicacion,
+            eventos: selectedEmpresa.eventos
+          }}
+        />
+      )}
+      
+      {editingEmpresa && (
+        <EditArtistModal
+          isOpen={!!editingEmpresa}
+          onClose={() => setEditingEmpresa(null)}
+          artist={editingEmpresa}
+          onSave={handleSaveEdit}
+        />
+      )}
     </div>
   )
 }
