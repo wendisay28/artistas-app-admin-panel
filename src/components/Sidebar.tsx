@@ -36,7 +36,7 @@ const navSections = [
   {
     label: 'Sistema',
     items: [
-      { href: '/settings/fees', label: 'Fees', icon: Percent },
+      { href: '/fees', label: 'Fees', icon: Percent },
       { href: '/support/tickets', label: 'Soporte', icon: MessageCircle },
       { href: '/configuration', label: 'Configuración', icon: Settings },
     ],

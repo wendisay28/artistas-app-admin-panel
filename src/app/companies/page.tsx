@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Header from '@/components/Header'
 import { Plus, Search, MapPin, Eye, Edit, Building, MoreVertical, Briefcase, CheckCircle, Shield } from 'lucide-react'
 import VerificationBadge from '@/components/VerificationBadge'
 import KYCModal from '@/components/KYCModal'
 import EditArtistModal from '@/components/EditArtistModal'
+import CreateCompanyModal from '@/components/CreateCompanyModal'
 
 // Datos de ejemplo para Empresas (siguiendo tu estructura de Artistas)
 interface Empresa {
@@ -46,6 +47,7 @@ const categoriasFiltro = ['Todos', 'Galería de Arte', 'Centro Cultural', 'Agenc
 
 export default function EmpresasPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [search, setSearch] = useState('')
   const [catActiva, setCatActiva] = useState('Todos')
   
@@ -53,6 +55,23 @@ export default function EmpresasPage() {
   const [selectedEmpresa, setSelectedEmpresa] = useState<Empresa | null>(null)
   const [viewingEmpresa, setViewingEmpresa] = useState<Empresa | null>(null)
   const [editingEmpresa, setEditingEmpresa] = useState<Empresa | null>(null)
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+
+  // Check if we should open create modal from URL parameter
+  useEffect(() => {
+    if (searchParams.get('create') === 'true') {
+      setIsCreateModalOpen(true)
+      // Clean URL
+      router.replace('/companies')
+    }
+  }, [searchParams, router])
+
+  const handleCreateCompany = (companyData: any) => {
+    console.log('Creando nueva empresa:', companyData)
+    // Aquí iría la lógica para crear una empresa
+    alert(`Empresa "${companyData.nombre}" creada exitosamente`)
+    setIsCreateModalOpen(false)
+  }
 
   const filtered = empresas.filter((e) => {
     const matchSearch = e.nombre.toLowerCase().includes(search.toLowerCase()) ||
@@ -129,7 +148,7 @@ export default function EmpresasPage() {
               />
             </div>
             <button 
-              onClick={() => router.push('/companies/create')}
+              onClick={() => setIsCreateModalOpen(true)}
               className="flex items-center gap-2 px-4 py-2 bg-[#7c3aed] text-white text-sm font-medium rounded-lg hover:bg-[#5b21b6] transition-colors"
             >
               <Plus size={16} />
@@ -249,6 +268,12 @@ export default function EmpresasPage() {
           onSave={handleSaveEdit}
         />
       )}
+
+      <CreateCompanyModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSave={handleCreateCompany}
+      />
     </div>
   )
 }

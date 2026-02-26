@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Header from '@/components/Header'
 import { 
   Search, 
@@ -17,6 +18,7 @@ import {
 } from 'lucide-react'
 import VerificationBadge from '@/components/VerificationBadge'
 import KYCModal from '@/components/KYCModal'
+import CreateUserModal from '@/components/CreateUserModal'
 
 // --- DATOS SIMULADOS ---
 interface Usuario {
@@ -49,9 +51,28 @@ const rolConfig: Record<string, { label: string; bg: string; text: string; icon:
 const rolesFiltro = ['Todos', 'cliente', 'empresa', 'admin']
 
 export default function UsuariosPage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [search, setSearch] = useState('')
   const [rolActivo, setRolActivo] = useState('Todos')
   const [selectedUser, setSelectedUser] = useState<Usuario | null>(null)
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+
+  // Check if we should open create modal from URL parameter
+  useEffect(() => {
+    if (searchParams.get('create') === 'true') {
+      setIsCreateModalOpen(true)
+      // Clean URL
+      router.replace('/users')
+    }
+  }, [searchParams, router])
+
+  const handleCreateUser = (userData: any) => {
+    console.log('Creando nuevo usuario:', userData)
+    // Aquí iría la lógica para crear un usuario
+    alert(`Usuario "${userData.nombre}" creado exitosamente`)
+    setIsCreateModalOpen(false)
+  }
 
   const filtered = usuariosInitial.filter((u) => {
     const matchSearch = u.nombre.toLowerCase().includes(search.toLowerCase()) || 
@@ -114,9 +135,12 @@ export default function UsuariosPage() {
                 className="pl-9 pr-4 py-2 text-sm border border-[#e5e7eb] rounded-xl outline-none w-[260px] focus:border-[#7c3aed] focus:ring-2 focus:ring-[#7c3aed10] transition-all bg-white"
               />
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 bg-[#7c3aed] text-white text-sm font-bold rounded-xl hover:bg-[#5b21b6] transition-all">
+            <button 
+              onClick={() => setIsCreateModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-[#7c3aed] text-white text-sm font-bold rounded-xl hover:bg-[#5b21b6] transition-all"
+            >
               <UserPlus size={16} />
-              Invitar
+              Nuevo Usuario
             </button>
           </div>
         </div>
@@ -215,10 +239,18 @@ export default function UsuariosPage() {
           user={{
             id: selectedUser.id,
             nombre: selectedUser.nombre,
+            tipo: selectedUser.rol === 'empresa' ? 'empresa' : 'artista',
             verificacion: selectedUser.verificacion
           }}
         />
       )}
+
+      {/* Create User Modal */}
+      <CreateUserModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSave={handleCreateUser}
+      />
     </div>
   )
 }

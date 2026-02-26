@@ -1,9 +1,11 @@
 // src/app/contracts/page.tsx
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Header from '@/components/Header'
 import { Plus, Search, CheckCircle, Clock, XCircle, Eye, Edit } from 'lucide-react'
+import CreateContractModal from '@/components/CreateContractModal'
 
 const contratos = [
   { id: 'C-001', artista: 'María Reyes', cliente: 'Bodas del Norte SA', tipo: 'Mariachi', fechaEvento: '2026-02-28', monto: '$12,000', estado: 'activo', ubicacion: 'Monterrey' },
@@ -23,8 +25,41 @@ const statusConfig: Record<string, { label: string; className: string; icon: any
 const estadosFiltro = ['Todos', 'activo', 'pendiente', 'completado', 'cancelado']
 
 export default function ContratosPage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [search, setSearch] = useState('')
   const [estadoActivo, setEstadoActivo] = useState('Todos')
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [viewingContract, setViewingContract] = useState<any>(null)
+  const [editingContract, setEditingContract] = useState<any>(null)
+
+  // Check if we should open create modal from URL parameter
+  useEffect(() => {
+    if (searchParams.get('create') === 'true') {
+      setIsCreateModalOpen(true)
+      // Clean URL
+      router.replace('/contracts')
+    }
+  }, [searchParams, router])
+
+  const handleCreateContract = (contractData: any) => {
+    console.log('Creando nuevo contrato:', contractData)
+    // Aquí iría la lógica para crear un contrato
+    alert(`Contrato "${contractData.id}" creado exitosamente`)
+    setIsCreateModalOpen(false)
+  }
+
+  const handleViewContract = (contract: any) => {
+    console.log('Viendo contrato:', contract)
+    setViewingContract(contract)
+    // Aquí iría la lógica para ver detalles del contrato
+  }
+
+  const handleEditContract = (contract: any) => {
+    console.log('Editando contrato:', contract)
+    setEditingContract(contract)
+    // Aquí iría la lógica para editar el contrato
+  }
 
   const filtered = contratos.filter((c) => {
     const matchSearch = c.artista.toLowerCase().includes(search.toLowerCase()) ||
@@ -81,7 +116,10 @@ export default function ContratosPage() {
                 className="pl-9 pr-4 py-2 text-sm border border-[#e5e7eb] rounded-lg outline-none w-[220px] focus:border-[#7c3aed] focus:ring-2 focus:ring-[#7c3aed10] transition-all"
               />
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 bg-[#7c3aed] text-white text-sm font-medium rounded-lg border-none cursor-pointer hover:bg-[#5b21b6] transition-colors">
+            <button 
+              onClick={() => setIsCreateModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-[#7c3aed] text-white text-sm font-medium rounded-lg border-none cursor-pointer hover:bg-[#5b21b6] transition-colors"
+            >
               <Plus size={16} />
               Nuevo contrato
             </button>
@@ -126,10 +164,16 @@ export default function ContratosPage() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex gap-1">
-                          <button className="p-1.5 rounded-md border-none bg-transparent text-[#9ca3af] cursor-pointer transition-all hover:bg-[#f3f4f6] hover:text-[#7c3aed]">
+                          <button 
+                            onClick={() => handleViewContract(c)}
+                            className="p-1.5 rounded-md border-none bg-transparent text-[#9ca3af] cursor-pointer transition-all hover:bg-[#f3f4f6] hover:text-[#7c3aed]"
+                          >
                             <Eye size={15} />
                           </button>
-                          <button className="p-1.5 rounded-md border-none bg-transparent text-[#9ca3af] cursor-pointer transition-all hover:bg-[#f3f4f6] hover:text-[#7c3aed]">
+                          <button 
+                            onClick={() => handleEditContract(c)}
+                            className="p-1.5 rounded-md border-none bg-transparent text-[#9ca3af] cursor-pointer transition-all hover:bg-[#f3f4f6] hover:text-[#7c3aed]"
+                          >
                             <Edit size={15} />
                           </button>
                         </div>
@@ -142,6 +186,13 @@ export default function ContratosPage() {
           </div>
         </div>
       </div>
+
+      {/* Create Contract Modal */}
+      <CreateContractModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSave={handleCreateContract}
+      />
     </div>
   )
 }

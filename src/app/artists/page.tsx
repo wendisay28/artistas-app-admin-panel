@@ -1,12 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Header from '@/components/Header'
 import { Plus, Search, Star, MapPin, Eye, Edit, UserPlus, MoreVertical, CheckCircle, Shield } from 'lucide-react'
 import VerificationBadge from '@/components/VerificationBadge'
 import KYCModal from '@/components/KYCModal'
 import ArtistDetailModal from '@/components/ArtistDetailModal'
 import EditArtistModal from '@/components/EditArtistModal'
+import CreateArtistModal from '@/components/CreateArtistModal'
 
 // Datos de ejemplo para Artistas
 interface Artista {
@@ -37,11 +39,31 @@ const statusConfig: Record<string, { label: string; className: string }> = {
 const categoriasFiltro = ['Todos', 'Mariachi', 'DJ', 'Música', 'Comedia', 'Danza']
 
 export default function ArtistasPage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [search, setSearch] = useState('')
   const [catActiva, setCatActiva] = useState('Todos')
   const [selectedArtist, setSelectedArtist] = useState<Artista | null>(null)
   const [viewingArtist, setViewingArtist] = useState<Artista | null>(null)
   const [editingArtist, setEditingArtist] = useState<Artista | null>(null)
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+
+  // Check if we should open create modal from URL parameter
+  useEffect(() => {
+    if (searchParams.get('create') === 'true') {
+      setIsCreateModalOpen(true)
+      // Clean URL
+      router.replace('/artists')
+    }
+  }, [searchParams, router])
+
+  const handleCreateArtist = (artistData: any) => {
+    console.log('Creando nuevo artista:', artistData)
+    // Aquí iría la lógica para crear un artista
+    // Por ahora solo simulamos la creación
+    alert(`Artista "${artistData.nombre}" creado exitosamente`)
+    setIsCreateModalOpen(false)
+  }
 
   const filtered = artistas.filter((a) => {
     const matchSearch = a.nombre.toLowerCase().includes(search.toLowerCase()) ||
@@ -97,7 +119,10 @@ export default function ArtistasPage() {
                 className="pl-9 pr-4 py-2 text-sm border border-[#e5e7eb] rounded-lg outline-none w-[240px] focus:border-[#7c3aed] focus:ring-2 focus:ring-[#7c3aed10] transition-all bg-white"
               />
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 bg-[#7c3aed] text-white text-sm font-medium rounded-lg hover:bg-[#5b21b6] transition-colors">
+            <button 
+              onClick={() => setIsCreateModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-[#7c3aed] text-white text-sm font-medium rounded-lg hover:bg-[#5b21b6] transition-colors"
+            >
               <UserPlus size={16} />
               Nuevo Artista
             </button>
@@ -226,6 +251,12 @@ export default function ArtistasPage() {
           }}
         />
       )}
+
+      <CreateArtistModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSave={handleCreateArtist}
+      />
     </div>
   )
 }
